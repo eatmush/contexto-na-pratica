@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Repositório de Contexto na Prática</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: tela simulada (esquerda) + narrador fixo (direita); empilha no celular.
+   Tema único de propósito: "mesa" clara com a janela do editor escura. */
+:root {
+  --desk: #dde3e9;
+  --ink: #16202a;
+  --muted: #566372;
+  --paper: #ffffff;
+  --accent: #0b6e64;
+  --spot: #f2b92c;
+  --vs-bg: #1d1f23;
+  --vs-side: #25272c;
+  --vs-line: #353840;
+  --vs-text: #d5d8de;
+  --vs-dim: #8b919b;
+  --ok: #6cc28a;
+  --warn: #e3b55a;
+  --font-display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--desk);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+}
+button { font: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--spot); outline-offset: 2px; }
+code { font-family: var(--font-mono); font-size: .88em; }
+
+/* Cabeçalho */
+.top {
+  display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+  padding: 14px 24px;
+}
+.brand { font-family: var(--font-display); font-weight: 700; font-size: 19px; letter-spacing: -.01em; }
+.brand span { color: var(--accent); }
+.chapters { display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto; }
+.chap {
+  border: 1px solid #c3ccd5; background: transparent; color: var(--muted);
+  border-radius: 999px; padding: 4px 12px; font-size: 13px;
+}
+.chap.done { color: var(--ink); border-color: #9fb0bf; }
+.chap.now { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+/* Área principal */
+.main {
+  flex: 1; min-height: 0;
+  display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 20px;
+  padding: 0 24px 24px;
+}
+.screen { position: relative; min-height: 520px; display: flex; }
+
+/* Janela genérica */
+.win {
+  flex: 1; display: flex; flex-direction: column; min-width: 0;
+  border-radius: 12px; overflow: hidden;
+  box-shadow: 0 1px 2px rgba(22,32,42,.2), 0 18px 50px rgba(22,32,42,.22);
+}
+.titlebar {
+  height: 34px; flex: none; display: flex; align-items: center; gap: 8px;
+  padding: 0 12px; font-size: 12.5px;
+}
+.lights { display: flex; gap: 7px; }
+.lights i { width: 12px; height: 12px; border-radius: 50%; display: block; }
+.lights i:nth-child(1) { background: #ef6a5e; }
+.lights i:nth-child(2) { background: #f4bf4f; }
+.lights i:nth-child(3) { background: #61c454; }
+.titlebar .t { flex: 1; text-align: center; margin-right: 52px; }
+
+/* Chat */
+.win.chat { background: #f6f7f9; }
+.win.chat .titlebar { background: #e9ecf0; color: var(--muted); }
+.chatbody { flex: 1; overflow: auto; padding: 28px 24px; display: flex; flex-direction: column; gap: 14px; max-width: 720px; width: 100%; margin: 0 auto; }
+.sep { text-align: center; font-size: 12.5px; color: var(--muted); display: flex; align-items: center; gap: 12px; }
+.sep::before, .sep::after { content: ""; flex: 1; height: 1px; background: #d3d9df; }
+.old { background: #eceff3; border-radius: 10px; padding: 12px 14px; color: var(--muted); font-size: 14px; }
+.msg { max-width: 82%; padding: 10px 14px; border-radius: 14px; font-size: 15px; }
+.msg.me { align-self: flex-end; background: var(--ink); color: #fff; border-bottom-right-radius: 4px; }
+.msg.ai { align-self: flex-start; background: #fff; border: 1px solid #dde2e7; border-bottom-left-radius: 4px; }
+.chatinput { margin: 0 24px 22px; border: 1px solid #d3d9df; background: #fff; border-radius: 12px; padding: 12px 14px; color: #9aa4ae; font-size: 14px; max-width: 672px; align-self: center; width: calc(100% - 48px); }
+
+/* Área de trabalho */
+.desktop {
+  flex: 1; border-radius: 12px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 22px; padding: 28px;
+  background: linear-gradient(160deg, #2f4a5a, #1f3140);
+  color: #eef2f5; text-align: center;
+  box-shadow: 0 18px 50px rgba(22,32,42,.22);
+}
+.desktop h3 { font-family: var(--font-display); font-weight: 700; margin: 0; font-size: clamp(26px, 4vw, 44px); letter-spacing: -.02em; text-wrap: balance; }
+.desktop p { margin: 0; color: #b9c7d2; max-width: 46ch; }
+.tools { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; width: 100%; max-width: 760px; }
+.toolcard { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16); border-radius: 12px; padding: 16px; text-align: left; }
+.toolcard b { display: block; font-family: var(--font-display); font-size: 18px; margin-bottom: 4px; }
+.toolcard span { color: #c3d0da; font-size: 14px; }
+.toolcard .ic { font-family: var(--font-mono); font-size: 12px; display: inline-block; border-radius: 6px; padding: 2px 7px; margin-bottom: 10px; background: #0b6e64; color: #fff; }
+.cal { font-family: var(--font-mono); font-size: 13px; background: rgba(255,255,255,.1); border-radius: 8px; padding: 6px 12px; color: #dfe7ee; }
+
+/* VS Code simulado */
+.win.vs { background: var(--vs-bg); color: var(--vs-text); }
+.win.vs .titlebar { background: #18191c; color: var(--vs-dim); border-bottom: 1px solid #000; }
+.vsbody { flex: 1; min-height: 0; display: grid; grid-template-columns: 44px 230px minmax(0, 1fr); }
+.actbar { background: #18191c; display: flex; flex-direction: column; align-items: center; gap: 16px; padding-top: 12px; }
+.actbar i { width: 20px; height: 20px; border-radius: 4px; border: 2px solid #5d636d; display: block; }
+.actbar i.on { border-color: var(--vs-text); }
+.side { background: var(--vs-side); min-width: 0; overflow: auto; font-size: 13px; position: relative; }
+.side h4 { margin: 0; padding: 10px 14px 6px; font-size: 11px; letter-spacing: .08em; color: var(--vs-dim); font-weight: 600; }
+.root { padding: 4px 14px; font-weight: 600; font-size: 11.5px; letter-spacing: .04em; }
+.empty { padding: 10px 14px; color: var(--vs-dim); font-size: 13px; }
+.fakebtn { display: block; margin: 10px 14px; padding: 6px; text-align: center; background: #0b6e64; color: #fff; border-radius: 4px; font-size: 13px; }
+.node { display: flex; align-items: center; gap: 6px; padding: 2px 10px; white-space: nowrap; }
+.node .nm { overflow: hidden; text-overflow: ellipsis; flex: 1; }
+.node.dir .nm::before { content: "▾ "; color: var(--vs-dim); }
+.node.active { background: #37404d; }
+.node .st { font-family: var(--font-mono); font-size: 11px; font-weight: 600; }
+.node.U .nm, .node.U .st { color: var(--ok); }
+.node.M .nm, .node.M .st { color: var(--warn); }
+.node.fresh { animation: fadein .5s ease-out; }
+@keyframes fadein { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: none; } }
+
+.work { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.tabs { height: 34px; flex: none; display: flex; background: #18191c; overflow: hidden; }
+.tab { padding: 0 14px; display: flex; align-items: center; font-size: 12.5px; color: var(--vs-dim); border-right: 1px solid #000; white-space: nowrap; }
+.tab.on { background: var(--vs-bg); color: var(--vs-text); border-top: 2px solid var(--accent); }
+.editor { flex: 1; min-height: 0; overflow: auto; font-family: var(--font-mono); font-size: 12.5px; line-height: 1.6; padding: 10px 0; position: relative; }
+.eline { display: grid; grid-template-columns: 44px minmax(0, 1fr); padding-right: 14px; }
+.eline .no { color: #5b616b; text-align: right; padding-right: 14px; user-select: none; }
+.eline .tx { white-space: pre-wrap; word-break: break-word; }
+.eline.hl { background: rgba(108,194,138,.16); box-shadow: inset 3px 0 0 var(--ok); }
+.eline.ref { background: rgba(242,185,44,.16); box-shadow: inset 3px 0 0 var(--spot); }
+.md-h { color: #7cc4f0; font-weight: 600; }
+.md-b { color: #e3b55a; }
+.md-c { color: #c9a0f0; }
+.md-s { color: #f0f2f5; font-weight: 600; }
+.md-m { color: var(--vs-dim); }
+.blank { height: 100%; display: flex; align-items: center; justify-content: center; color: #4c525b; font-family: var(--font-body); font-size: 15px; }
+
+.term { height: 46%; flex: none; border-top: 1px solid var(--vs-line); display: flex; flex-direction: column; min-height: 0; position: relative; }
+.termhead { display: flex; gap: 18px; padding: 6px 14px; font-size: 11px; letter-spacing: .06em; color: var(--vs-dim); }
+.termhead b { color: var(--vs-text); border-bottom: 1px solid var(--vs-text); font-weight: 500; }
+.tbody { flex: 1; overflow: auto; padding: 4px 14px 12px; font-family: var(--font-mono); font-size: 12.5px; line-height: 1.6; }
+.ln { white-space: pre-wrap; word-break: break-word; }
+.ps { color: var(--ok); }
+.gt { color: var(--vs-dim); }
+.ln.user { color: #fff; background: #2a2d33; margin: 6px 0 4px; padding: 2px 6px; border-radius: 3px; }
+.paste { color: var(--vs-dim); font-style: italic; }
+.ln.claude { display: grid; grid-template-columns: 18px minmax(0, 1fr); margin: 4px 0; }
+.ln.claude .dot { color: #e28b5f; }
+.ln.claude code, .ln.tool code { color: #c9a0f0; font-size: 1em; }
+.ln.tool { color: var(--vs-dim); padding-left: 18px; }
+.ln.tool.ok { color: var(--ok); }
+.box { border: 1px solid #e28b5f; border-radius: 6px; padding: 6px 12px; margin: 6px 0; display: inline-block; max-width: 100%; }
+.box b { color: #e28b5f; }
+.box div { color: var(--vs-dim); }
+.cursor { display: inline-block; width: 7px; height: 14px; background: var(--vs-text); vertical-align: -2px; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* Destaques */
+.spot { box-shadow: inset 0 0 0 2px var(--spot); animation: pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 50% { box-shadow: inset 0 0 0 2px rgba(242,185,44,.35); } }
+.tag {
+  position: absolute; z-index: 3; top: 8px; right: 10px;
+  background: var(--spot); color: #1b1300; font-family: var(--font-body);
+  font-size: 12px; font-weight: 600; border-radius: 999px; padding: 2px 10px;
+}
+
+/* Guia final */
+.guide { flex: 1; overflow: auto; background: var(--paper); border-radius: 12px; padding: 28px clamp(18px, 4vw, 40px); box-shadow: 0 18px 50px rgba(22,32,42,.16); }
+.guide h3 { font-family: var(--font-display); font-size: 28px; margin: 0 0 4px; letter-spacing: -.02em; }
+.guide > p { margin: 0 0 20px; color: var(--muted); max-width: 65ch; }
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 18px; counter-reset: s; max-width: 760px; }
+.steps > li { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; counter-increment: s; }
+.steps > li::before { content: counter(s); width: 28px; height: 28px; border-radius: 50%; background: var(--ink); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; }
+.steps h5 { margin: 2px 0 4px; font-size: 16px; }
+.steps p { margin: 0 0 8px; color: var(--muted); font-size: 15px; }
+.steps a { color: var(--accent); }
+.copy { position: relative; background: #1d1f23; color: #e7e9ed; border-radius: 8px; padding: 10px 84px 10px 12px; font-family: var(--font-mono); font-size: 13px; white-space: pre-wrap; word-break: break-word; margin: 6px 0; }
+.copy.long { max-height: 220px; overflow: auto; }
+.copy small { display: block; color: #8b919b; font-family: var(--font-body); font-size: 12px; margin-bottom: 2px; }
+.copy button { position: absolute; top: 8px; right: 8px; background: #3a3e46; color: #fff; border: 0; border-radius: 6px; padding: 3px 10px; font-size: 12px; font-family: var(--font-body); }
+.contact { margin-top: 26px; max-width: 760px; border: 1px solid #cfd8e0; background: #f3f6f8; border-radius: 12px; padding: 16px 18px; }
+.contact b { font-family: var(--font-display); font-size: 18px; }
+.contact p { margin: 4px 0 0; color: var(--muted); }
+
+/* Narrador */
+.narr {
+  background: var(--paper); border-radius: 14px; padding: 22px 22px 18px;
+  display: flex; flex-direction: column; min-height: 0;
+  box-shadow: 0 1px 2px rgba(22,32,42,.12), 0 10px 30px rgba(22,32,42,.1);
+}
+.eyebrow { font-size: 12.5px; color: var(--accent); font-weight: 600; letter-spacing: .02em; }
+.narr h2 { font-family: var(--font-display); font-size: 25px; line-height: 1.15; margin: 6px 0 12px; letter-spacing: -.02em; text-wrap: balance; }
+.ntext { flex: 1; overflow: auto; font-size: 15.5px; }
+.ntext p { margin: 0 0 12px; }
+.ntext ul, .ntext ol { margin: 0 0 12px; padding-left: 20px; }
+.ntext li { margin-bottom: 6px; }
+.ntext code { background: #eef1f4; border-radius: 4px; padding: 1px 5px; }
+.nav { display: flex; align-items: center; gap: 10px; padding-top: 14px; border-top: 1px solid #e5e9ed; margin-top: 8px; }
+.count { flex: 1; text-align: center; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.btn { border-radius: 10px; padding: 10px 16px; border: 1px solid #c9d2da; background: #fff; color: var(--ink); font-weight: 500; }
+.btn:disabled { opacity: .4; cursor: default; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; padding: 10px 22px; }
+.hint { font-size: 12px; color: #8a96a2; text-align: center; margin-top: 8px; }
+
+@media (max-width: 980px) {
+  .main { grid-template-columns: minmax(0, 1fr); }
+  .screen { min-height: 480px; height: 64vh; }
+  .narr { order: 2; }
+  .chapters { margin-left: 0; }
+  .vsbody { grid-template-columns: 36px 170px minmax(0, 1fr); }
+}
+@media (max-width: 600px) {
+  .top { padding: 12px 16px; }
+  .main { padding: 0 16px 16px; }
+  .vsbody { grid-template-columns: 130px minmax(0, 1fr); }
+  .actbar { display: none; }
+  .tools { grid-template-columns: minmax(0, 1fr); }
+  .editor, .tbody { font-size: 11.5px; }
+  .eline { grid-template-columns: 30px minmax(0, 1fr); }
+  .hint { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">Repositório de contexto <span>na prática</span></div>
+  <nav class="chapters" id="chapters" aria-label="Partes"></nav>
+</header>
+
+<main class="main">
+  <section class="screen" id="screen" aria-label="Tela simulada"></section>
+  <aside class="narr" aria-live="polite">
+    <div class="eyebrow" id="eyebrow"></div>
+    <h2 id="ntitle"></h2>
+    <div class="ntext" id="ntext"></div>
+    <div class="nav">
+      <button class="btn" id="prev">Voltar</button>
+      <div class="count" id="count"></div>
+      <button class="btn primary" id="next">Próximo</button>
+    </div>
+    <div class="hint">Dica: use as setas ← → do teclado</div>
+  </aside>
+</main>
+
+<script>
+/* ---------- Conteúdo dos arquivos do repositório de exemplo ---------- */
+const F = {};
+F["CLAUDE.md"] = `# CLAUDE.md
+
+Este arquivo orienta o Claude Code neste repositório.
+
+## O que é este repositório
+
+Contexto da reforma do meu apartamento: cozinha e
+banheiro social. Estágio atual: recebendo orçamentos,
+ainda não fechei com ninguém.
+
+## Sobre mim
+
+- **Papel:** dono do apartamento, coordeno a obra
+  sem arquiteto
+- **Restrições:** R$ 45.000 no total; a obra precisa
+  terminar até março
+- **Conhecimento de obra:** nenhum. Risco: aceitar
+  um orçamento ruim por não saber comparar
+
+**Preferências de comunicação:**
+- Direto, sem rodeio
+- Me avise quando um gasto ameaçar o orçamento total
+
+## Estrutura do repositório
+
+orcamentos/  → propostas recebidas, uma por fornecedor
+decisoes/    → o que já foi decidido e por quê
+plano/       → próximos passos e prazos
+atas/        → conversas com fornecedores e visitas
+
+## Comandos disponíveis
+
+- \`/debrief\` — revisa a conversa e propõe o que guardar.
+  Pede aprovação antes de escrever.
+- \`/backup\` — salva uma cópia de segurança no GitHub.
+
+## Como me ajudar
+
+- Orçamento novo → registrar em \`orcamentos/\` e comparar
+  com o teto do item em \`decisoes/escolhas.md\`
+- Toda decisão → \`decisoes/escolhas.md\`, com o motivo
+- Prazos e pendências → \`plano/proximos-passos.md\``;
+
+F["decisoes/escolhas.md"] = `# Escolhas da reforma
+
+## Já decidido
+
+- Piso da cozinha: porcelanato 60x60 cinza claro.
+  Motivo: mais fácil de limpar e 30% mais barato
+  que o 90x90
+- Banheiro: trocar a banheira por box, para ganhar
+  espaço
+
+## Teto por item (soma: R$ 45.000)
+
+- Marcenaria (armários da cozinha): R$ 12.000
+- Revestimentos e piso: R$ 9.000
+- Mão de obra do pedreiro: R$ 14.000
+- Elétrica e hidráulica: R$ 6.000
+- Reserva para imprevistos: R$ 4.000`;
+
+F["orcamentos/pedreiro-joao.md"] = `# Pedreiro — João
+
+- Valor: R$ 13.500 (teto: R$ 14.000)
+- Começa em 05/12, duração de 10 semanas
+- Status: bom candidato, falta pedir referências`;
+
+F["plano/proximos-passos.md"] = `# Próximos passos
+
+- [ ] Pedir 3 orçamentos de marcenaria (até 15/11)
+- [ ] Visita do eletricista (20/11)
+- [ ] Fechar o pedreiro antes de dezembro (agenda lota)`;
+
+F["plano/proximos-passos.md@2"] = `# Próximos passos
+
+- [ ] Pedir 3 orçamentos de marcenaria (até 15/11)
+      Recebido: Paulo. Faltam 2.
+- [ ] Decidir a marcenaria só depois dos 3 orçamentos
+- [ ] Visita do eletricista (20/11)
+- [ ] Fechar o pedreiro antes de dezembro (agenda lota)`;
+
+F["orcamentos/marcenaria-paulo.md"] = `# Marcenaria — Paulo
+
+Recebido em 08/11.
+
+- Armários da cozinha em MDF laca: R$ 15.800
+- Mesmo projeto em MDF texturizado: R$ 12.900
+- Teto planejado para marcenaria: R$ 12.000
+
+Status: aguardando os outros 2 orçamentos antes
+de decidir.`;
+
+F[".claude/commands/debrief.md"] = `---
+description: Revisa a conversa e propõe o que guardar
+---
+
+Revise esta conversa e identifique o que vale guardar
+no repositório: orçamentos novos, decisões, prazos.
+
+Para cada item, diga o que é, em qual arquivo vai
+ficar e mostre um rascunho. Espere minha aprovação
+antes de escrever qualquer arquivo.`;
+
+F[".claude/commands/backup.md"] = `---
+description: Salva uma cópia de segurança no GitHub
+---
+
+Confira o que mudou desde a última cópia, salve as
+mudanças com uma descrição curta e envie para o
+GitHub. Se encontrar algo que pareça senha ou dado
+sensível, pare e me avise antes.`;
+
+const ROTEIRO = `Quero criar um repositório de contexto nesta pasta: arquivos em markdown que você vai ler em toda conversa para me ajudar com um assunto da minha vida.
+
+Antes de criar qualquer arquivo, me entreviste, uma pergunta por vez:
+1. Qual é o assunto? Resuma em uma frase.
+2. Em que estágio ele está?
+3. Qual é o meu papel nele?
+4. Quais são minhas restrições (tempo, dinheiro, prazos)?
+5. O que eu já sei bem e onde estão minhas lacunas?
+6. Como prefiro que você fale comigo sobre esse assunto?
+7. Que tipo de informação vou precisar registrar ao longo do tempo?
+
+Depois, crie:
+- Um CLAUDE.md enxuto: o que é o repositório, quem sou eu, minhas preferências, a estrutura de pastas e regras dizendo onde registrar cada tipo de informação.
+- Poucas pastas com propósito claro, sempre incluindo plano/ (próximos passos) e atas/ (registro de conversas).
+- Dois comandos em .claude/commands/:
+  - debrief.md: revisa a conversa, propõe o que guardar e onde, e espera minha aprovação antes de escrever.
+  - backup.md: salva uma cópia no GitHub. Se o git ou o GitHub ainda não estiverem configurados no meu computador, me guie passo a passo.
+- Separe sempre fato confirmado de suposição.
+
+No fim, me mostre o que criou e pergunte se quero ajustar algo.`;
+
+/* ---------- Passos ---------- */
+const CHAPTERS = ["O problema", "Montando", "Uma semana depois", "Guardando", "Sua vez"];
+const HOME = "~ $", REPO = "~/reforma-apartamento $";
+const BASE_FILES = ["CLAUDE.md", "decisoes/escolhas.md", "orcamentos/pedreiro-joao.md", "plano/proximos-passos.md", "atas/", ".claude/commands/debrief.md", ".claude/commands/backup.md"];
+
+const STEPS = [
+  { ch: 0, title: "Você já passou por isso",
+    body: `<p>Três dias atrás você passou uma hora explicando a reforma do seu apartamento para a IA: orçamento, prazos, o que já tinha decidido.</p>
+<p>Hoje chegou o orçamento do marceneiro, você abriu uma conversa nova e a IA não lembra de nada. Ou você explica tudo de novo, ou garimpa a conversa antiga no meio de dezenas de outras.</p>
+<p>Este passo a passo mostra outro jeito de trabalhar, em que a IA começa toda conversa já sabendo do seu assunto.</p>`,
+    apply: s => { s.mode = "chat"; } },
+
+  { ch: 0, title: "A ideia: uma pasta que a IA lê",
+    body: `<p>Em vez de deixar o contexto espalhado em conversas, você guarda tudo num lugar só: uma pasta no seu computador com arquivos de texto. Isso é um <b>repositório de contexto</b>.</p>
+<p>Toda vez que você conversa com o Claude dentro dessa pasta, ele lê esses arquivos antes de responder.</p>
+<p>Você vai usar as três ferramentas da tela. Nenhuma delas exige saber programar.</p>`,
+    apply: s => { s.mode = "desktop"; s.desk = "tools"; } },
+
+  { ch: 1, title: "Este é o VS Code",
+    body: `<p>Pense nele como um editor de texto. Três áreas importam:</p>
+<ol><li><b>Arquivos:</b> a lista do que tem na sua pasta. Por enquanto, vazia.</li>
+<li><b>Editor:</b> onde um arquivo aparece quando você clica nele.</li>
+<li><b>Terminal:</b> onde você digita comandos. Fica dentro do próprio VS Code (menu Terminal → New Terminal).</li></ol>`,
+    apply: s => { s.mode = "vs"; s.labels = true; } },
+
+  { ch: 1, title: "Criando a pasta",
+    body: `<p>No terminal, você digita três comandos. São sempre os mesmos:</p>
+<ul><li><code>mkdir reforma-apartamento</code> cria uma pasta nova.</li>
+<li><code>cd reforma-apartamento</code> entra nela.</li>
+<li><code>code .</code> abre essa pasta no VS Code. O ponto quer dizer "esta pasta aqui".</li></ul>
+<p>Repare que o nome da pasta apareceu no topo da lista de arquivos.</p>`,
+    apply: s => {
+      s.term.push({ t: "prompt", ps: HOME, c: "mkdir reforma-apartamento" },
+                  { t: "prompt", ps: HOME, c: "cd reforma-apartamento" },
+                  { t: "prompt", ps: REPO, c: "code ." });
+      s.folder = "reforma-apartamento"; s.ps = REPO; s.focus = "term";
+    } },
+
+  { ch: 1, title: "Chamando o Claude",
+    body: `<p>Digitar <code>claude</code> no terminal abre o Claude Code.</p>
+<p>É o mesmo Claude do chat, com uma diferença: aqui ele enxerga e edita os arquivos desta pasta.</p>`,
+    apply: s => { s.term.push({ t: "prompt", ps: REPO, c: "claude" }, { t: "box" }); s.claude = true; s.focus = "term"; } },
+
+  { ch: 1, title: "A entrevista",
+    body: `<p>Você cola um roteiro pronto (ele está no fim deste passo a passo) e o Claude começa a te entrevistar sobre o assunto.</p>
+<p>Responda com sinceridade, inclusive sobre o que você não sabe. Repare na última resposta: dizer que nunca fez uma obra muda o jeito como ele vai te ajudar.</p>`,
+    apply: s => {
+      s.term.push(
+        { t: "paste", c: "[Você colou o roteiro de criação do repositório · 24 linhas]" },
+        { t: "claude", c: "Vou te fazer algumas perguntas antes de criar qualquer arquivo. Primeiro: sobre o que é este repositório?" },
+        { t: "user", c: "A reforma do meu apartamento: cozinha e banheiro social." },
+        { t: "claude", c: "Em que pé está a reforma, e quais são as suas restrições?" },
+        { t: "user", c: "Estou recebendo orçamentos. Tenho R$ 45 mil no total e preciso terminar até março. Já tenho o do pedreiro João: R$ 13.500." },
+        { t: "claude", c: "Você já fez uma obra antes?" },
+        { t: "user", c: "Nunca. Meu medo é aceitar um orçamento ruim por não saber comparar." },
+        { t: "tool", c: "(mais 4 perguntas sobre decisões já tomadas e como você quer ser ajudado)" });
+      s.focus = "term";
+    } },
+
+  { ch: 1, title: "O Claude monta a estrutura",
+    body: `<p>Com as suas respostas, o Claude cria os arquivos. Cada pasta guarda um tipo de informação:</p>
+<ul><li><b>orcamentos/</b>: uma proposta por fornecedor</li>
+<li><b>decisoes/</b>: o que já foi decidido e por quê</li>
+<li><b>plano/</b>: próximos passos e prazos</li>
+<li><b>atas/</b>: conversas e visitas</li></ul>
+<p>A pasta <b>.claude</b> guarda dois comandos, <code>/debrief</code> e <code>/backup</code>, que você vai usar mais adiante.</p>`,
+    apply: s => {
+      s.term.push({ t: "claude", c: "Entendi. Vou criar a estrutura do repositório:" },
+        ...["CLAUDE.md", "decisoes/escolhas.md", "orcamentos/pedreiro-joao.md", "plano/proximos-passos.md", "atas/", ".claude/commands/debrief.md e backup.md"].map(c => ({ t: "tool", ok: true, c: "✓ " + c })),
+        { t: "claude", c: "Pronto. Dá uma olhada no `CLAUDE.md` e me diz se quer ajustar algo." });
+      s.files = BASE_FILES.slice();
+      s.focus = "side";
+    } },
+
+  { ch: 1, title: "O arquivo principal",
+    body: `<p>O <b>CLAUDE.md</b> é lido inteiro toda vez que o Claude abre nesta pasta. Ele diz quem você é, quais são suas restrições, como você quer ser ajudado e onde fica cada coisa.</p>
+<p>É texto simples, num formato chamado <b>markdown</b>: o <code>#</code> vira título e o <code>-</code> vira item de lista. Como não tem formatação escondida, você e a IA leem e editam o mesmo arquivo, e dá para guardar o histórico de cada mudança.</p>
+<p>Você pode editar esse arquivo à mão quando quiser.</p>`,
+    apply: s => { s.open = "CLAUDE.md"; s.focus = "editor"; } },
+
+  { ch: 1, title: "Onde ficam os fatos",
+    body: `<p>O CLAUDE.md diz onde as coisas estão. Os fatos ficam nos outros arquivos.</p>
+<p>Aqui, em <b>decisoes/escolhas.md</b>, está o que você já decidiu e quanto pode gastar com cada parte da obra.</p>
+<p>Guarde o teto de <b>R$ 12.000 para marcenaria</b>. Ele vai aparecer de novo.</p>`,
+    apply: s => { s.open = "decisoes/escolhas.md"; s.ref = { "decisoes/escolhas.md": [13] }; s.focus = "editor"; } },
+
+  { ch: 2, title: "Uma semana depois",
+    body: `<p>Você fechou tudo e seguiu a vida. Aí chegou o orçamento do marceneiro.</p>
+<p>É a mesma situação do chat lá do começo. Vamos ver o que muda.</p>`,
+    apply: s => { s.mode = "desktop"; s.desk = "later"; s.term = []; s.tabs = []; s.open = null; s.claude = false; } },
+
+  { ch: 2, title: "Voltando ao repositório",
+    body: `<p>Abra o VS Code e a pasta da reforma (menu File → Open Folder, ou a lista de pastas recentes). No terminal, digite <code>claude</code> de novo.</p>
+<p>Não tem nada para instalar e nada para reexplicar. Ao abrir, o Claude lê o CLAUDE.md por conta própria.</p>`,
+    apply: s => { s.mode = "vs"; s.term.push({ t: "prompt", ps: REPO, c: "claude" }, { t: "box" }); s.claude = true; s.focus = "term"; } },
+
+  { ch: 2, title: "A mesma pergunta, outra resposta",
+    body: `<p>Você fez exatamente a pergunta do chat. Desta vez o Claude consultou seus arquivos e respondeu com os seus números: o teto da marcenaria, a reserva para imprevistos e o prazo dos outros orçamentos.</p>
+<p>No editor, as linhas em amarelo são de onde ele tirou a informação.</p>
+<p><b>Você não explicou nada.</b> Essa é a diferença em relação ao chat.</p>`,
+    apply: s => {
+      s.term.push(
+        { t: "user", c: "O marceneiro Paulo mandou R$ 15.800 pelos armários da cozinha. Cabe no meu orçamento?" },
+        { t: "tool", c: "Lendo decisoes/escolhas.md" },
+        { t: "tool", c: "Lendo plano/proximos-passos.md" },
+        { t: "claude", c: "Não cabe no que você planejou. O teto de marcenaria é **R$ 12.000** (`decisoes/escolhas.md`), então esse orçamento passa R$ 3.800.\n\nSe fechar assim, a reserva para imprevistos cai de R$ 4.000 para R$ 200, antes de a obra começar.\n\nAntes de decidir:\n1. Ainda faltam 2 dos 3 orçamentos de marcenaria (prazo 15/11, em `plano/proximos-passos.md`).\n2. Pergunte ao Paulo se trocar o MDF laca por MDF texturizado baixa o valor." });
+      s.open = "decisoes/escolhas.md"; s.ref = { "decisoes/escolhas.md": [13, 17] }; s.focus = "term";
+    } },
+
+  { ch: 2, title: "A conversa continua",
+    body: `<p>Você negociou com o marceneiro e decidiu esperar os outros orçamentos.</p>
+<p>Isso é informação nova, que por enquanto só existe nesta conversa. Se você fechar agora, ela se perde.</p>`,
+    apply: s => {
+      s.term.push(
+        { t: "user", c: "Ele topou fazer em MDF texturizado por R$ 12.900. Vou esperar os outros dois orçamentos antes de decidir." },
+        { t: "claude", c: "Boa. Com R$ 12.900 você fica R$ 900 acima do teto, e a reserva cairia para R$ 3.100. Os outros dois orçamentos vencem em 15/11." });
+      s.focus = "term";
+    } },
+
+  { ch: 3, title: "/debrief: o que vale guardar?",
+    body: `<p>No fim da conversa, digite <code>/debrief</code>. O Claude revisa o que foi conversado e propõe o que guardar e em qual arquivo.</p>
+<p>Ele não escreve nada sem você aprovar. E também diz o que não vai mexer: como nada foi decidido ainda, o arquivo de decisões fica como está.</p>`,
+    apply: s => {
+      s.term.push(
+        { t: "user", c: "/debrief" },
+        { t: "claude", c: "Revisei a conversa. Proponho guardar:\n\n1. `orcamentos/marcenaria-paulo.md` (novo)\n   Proposta do Paulo: R$ 15.800 em laca, R$ 12.900 em MDF texturizado.\n\n2. `plano/proximos-passos.md` (editar)\n   Decidir a marcenaria só depois dos 3 orçamentos.\n\nNão vou mexer em `decisoes/escolhas.md`: nada foi decidido ainda.\n\nPosso salvar?" });
+      s.focus = "term";
+    } },
+
+  { ch: 3, title: "Os arquivos se atualizam",
+    body: `<p>Com o seu ok, o Claude cria e edita os arquivos. As linhas em verde no editor são as novas.</p>
+<p>As letras na lista de arquivos mostram o que mudou: <b>U</b> para arquivo novo, <b>M</b> para arquivo modificado.</p>
+<p>Na próxima conversa, o Claude já vai saber que você está esperando os outros orçamentos.</p>`,
+    apply: s => {
+      s.term.push({ t: "user", c: "pode salvar" },
+        { t: "tool", ok: true, c: "✓ orcamentos/marcenaria-paulo.md (novo)" },
+        { t: "tool", ok: true, c: "✓ plano/proximos-passos.md (editado)" },
+        { t: "claude", c: "Salvo. Quando quiser, rode `/backup` para guardar uma cópia." });
+      s.files.push("orcamentos/marcenaria-paulo.md");
+      s.contents["plano/proximos-passos.md"] = F["plano/proximos-passos.md@2"];
+      s.changed = { "orcamentos/marcenaria-paulo.md": "U", "plano/proximos-passos.md": "M" };
+      s.tabs = ["orcamentos/marcenaria-paulo.md"];
+      s.open = "plano/proximos-passos.md"; s.hl = { "plano/proximos-passos.md": [4, 5] };
+      s.fresh = ["orcamentos/marcenaria-paulo.md"];
+      s.focus = "editor";
+    } },
+
+  { ch: 3, title: "/backup: salvar uma cópia",
+    body: `<p>Até aqui, tudo existe só no seu computador. O <code>/backup</code> envia uma cópia de segurança para o <b>GitHub</b>, um serviço que guarda arquivos e o histórico de cada mudança. Pense nele como um Google Drive para este tipo de pasta.</p>
+<p>As letras U e M sumiram da lista de arquivos: está tudo salvo.</p>`,
+    apply: s => {
+      s.term.push({ t: "user", c: "/backup" },
+        { t: "tool", c: "Conferindo o que mudou: 1 arquivo novo, 1 editado" },
+        { t: "tool", ok: true, c: "✓ Cópia de segurança enviada para o GitHub" },
+        { t: "claude", c: "Pronto, está tudo salvo." });
+      s.changed = {}; s.focus = "term";
+    } },
+
+  { ch: 4, title: "O ciclo completo",
+    body: `<p>Daqui pra frente, é só repetir quatro passos:</p>
+<ol><li><b>Abrir</b> a pasta no VS Code e digitar <code>claude</code>.</li>
+<li><b>Conversar</b> sobre o assunto.</li>
+<li><code>/debrief</code> para guardar o que importa.</li>
+<li><code>/backup</code> para salvar uma cópia.</li></ol>
+<p>Cada volta deixa o Claude mais informado sobre o seu assunto. Serve para uma reforma, um negócio, o trabalho ou um hobby: um repositório por assunto.</p>`,
+    apply: s => { s.mode = "desktop"; s.desk = "cycle"; } },
+
+  { ch: 4, title: "Agora no seu computador",
+    body: `<p>Ao lado está o passo a passo para montar o seu, com os comandos e o roteiro prontos para copiar.</p>
+<p>Escolha um assunto em que você gostaria de ter ajuda constante, e não só uma pergunta isolada. Não precisa ser grande nem definitivo.</p>`,
+    apply: s => { s.mode = "guide"; } },
+];
+
+/* ---------- Estado ---------- */
+function fresh() {
+  return { mode: "chat", desk: null, folder: null, ps: HOME, files: [], contents: {}, changed: {},
+           open: null, tabs: [], term: [], claude: false, focus: null, labels: false, hl: {}, ref: {}, fresh: [] };
+}
+function replay(i) {
+  const s = fresh();
+  for (let k = 0; k <= i; k++) {
+    s.focus = null; s.labels = false; s.hl = {}; s.ref = {}; s.fresh = [];
+    STEPS[k].apply(s);
+  }
+  if (s.open && !s.tabs.includes(s.open)) s.tabs.push(s.open);
+  return s;
+}
+const content = (s, p) => s.contents[p] ?? F[p] ?? "";
+
+/* ---------- Utilidades ---------- */
+const esc = t => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const inline = t => esc(t).replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const $ = id => document.getElementById(id);
+
+function mdLine(l) {
+  let h = esc(l);
+  if (/^#{1,6} /.test(l)) return `<span class="md-h">${h}</span>`;
+  if (/^---$/.test(l) || /^description:/.test(l)) return `<span class="md-m">${h}</span>`;
+  h = h.replace(/`([^`]+)`/g, '<span class="md-c">`$1`</span>')
+       .replace(/\*\*([^*]+)\*\*/g, '<span class="md-s">**$1**</span>')
+       .replace(/^(\s*- (\[ \] )?)/, '<span class="md-b">$1</span>');
+  return h;
+}
+
+/* ---------- Telas ---------- */
+function chatHTML() {
+  return `<div class="win chat"><div class="titlebar"><div class="lights"><i></i><i></i><i></i></div><div class="t">Chat de IA</div></div>
+  <div class="chatbody">
+    <div class="sep">3 dias atrás</div>
+    <div class="old">Você explicou a reforma inteira: orçamento total, teto por item, prazos, o orçamento do pedreiro e o que já tinha decidido. <b>42 mensagens.</b></div>
+    <div class="sep">Nova conversa · hoje</div>
+    <div class="msg me">O marceneiro Paulo mandou R$ 15.800 pelos armários da cozinha. Cabe no meu orçamento?</div>
+    <div class="msg ai">Para avaliar, preciso de mais informações. Qual é o seu orçamento total para a reforma? Quanto você planejou gastar com marcenaria? Já recebeu outros orçamentos para comparar?</div>
+  </div>
+  <div class="chatinput">Escreva uma mensagem…</div></div>`;
+}
+
+function desktopHTML(s) {
+  if (s.desk === "tools") return `<div class="desktop">
+    <h3>Três ferramentas, um jeito de trabalhar</h3>
+    <div class="tools">
+      <div class="toolcard"><span class="ic">1</span><b>VS Code</b><span>Onde você vê e edita os arquivos da pasta. Gratuito.</span></div>
+      <div class="toolcard"><span class="ic">2</span><b>Terminal</b><span>Onde você digita comandos. Já vem dentro do VS Code.</span></div>
+      <div class="toolcard"><span class="ic">3</span><b>Claude Code</b><span>O Claude rodando no terminal, lendo e editando a sua pasta. Usa a sua conta do Claude.</span></div>
+    </div></div>`;
+  if (s.desk === "later") return `<div class="desktop">
+    <div class="cal">sáb, 8 de novembro</div>
+    <h3>Uma semana depois</h3>
+    <p>Chegou o orçamento do marceneiro.</p></div>`;
+  return `<div class="desktop">
+    <h3>Abrir → conversar → /debrief → /backup</h3>
+    <p>Quatro passos, sempre os mesmos. A cada volta, seus arquivos ficam mais completos e o Claude começa a conversa sabendo mais.</p></div>`;
+}
+
+function treeHTML(s) {
+  const root = { dirs: {}, files: [] };
+  for (const p of s.files) {
+    const parts = p.split("/"); let n = root;
+    const isDir = p.endsWith("/");
+    const segs = isDir ? parts.slice(0, -1) : parts.slice(0, -1);
+    for (const d of segs) n = n.dirs[d] ??= { dirs: {}, files: [] };
+    if (!isDir) n.files.push(p);
+  }
+  const render = (n, depth) => {
+    let h = "";
+    for (const d of Object.keys(n.dirs).sort((a, b) => (a[0] === "." ? -1 : 0) || a.localeCompare(b))) {
+      h += `<div class="node dir" style="padding-left:${10 + depth * 12}px"><span class="nm">${esc(d)}</span></div>`;
+      h += render(n.dirs[d], depth + 1);
+    }
+    for (const p of n.files.slice().sort()) {
+      const st = s.changed[p] || "";
+      const cls = ["node", st, p === s.open ? "active" : "", s.fresh.includes(p) ? "fresh" : ""].join(" ");
+      h += `<div class="${cls}" style="padding-left:${22 + depth * 12}px"><span class="nm">${esc(p.split("/").pop())}</span><span class="st">${st}</span></div>`;
+    }
+    return h;
+  };
+  return render(root, 0);
+}
+
+function vsHTML(s) {
+  const title = s.folder ? `${s.open ? s.open.split("/").pop() + " — " : ""}${s.folder} — Visual Studio Code` : "Visual Studio Code";
+  const side = s.folder
+    ? `<div class="root">${esc(s.folder.toUpperCase())}</div>${s.files.length ? treeHTML(s) : '<div class="empty">Pasta vazia.</div>'}`
+    : `<div class="empty">Nenhuma pasta aberta.</div><div class="fakebtn">Abrir pasta</div>`;
+  const tabs = s.tabs.map(p => `<div class="tab ${p === s.open ? "on" : ""}">${esc(p.split("/").pop())}</div>`).join("");
+  let editor;
+  if (s.open) {
+    const hl = s.hl[s.open] || [], ref = s.ref[s.open] || [];
+    editor = content(s, s.open).split("\n").map((l, i) =>
+      `<div class="eline ${hl.includes(i + 1) ? "hl" : ""} ${ref.includes(i + 1) ? "ref" : ""}"><span class="no">${i + 1}</span><span class="tx">${mdLine(l) || " "}</span></div>`).join("");
+  } else editor = `<div class="blank">Nenhum arquivo aberto</div>`;
+  const tag = (n, t) => s.labels ? `<span class="tag">${n} · ${t}</span>` : "";
+  const sp = a => s.focus === a ? "spot" : "";
+  return `<div class="win vs"><div class="titlebar"><div class="lights"><i></i><i></i><i></i></div><div class="t">${esc(title)}</div></div>
+  <div class="vsbody">
+    <div class="actbar"><i class="on"></i><i></i><i></i></div>
+    <div class="side ${sp("side")}">${tag(1, "Arquivos")}<h4>EXPLORADOR</h4>${side}</div>
+    <div class="work">
+      <div class="tabs">${tabs}</div>
+      <div class="editor ${sp("editor")}" id="editor">${tag(2, "Editor")}${editor}</div>
+      <div class="term ${sp("term")}">${tag(3, "Terminal")}
+        <div class="termhead"><b>TERMINAL</b><span>PROBLEMAS</span><span>SAÍDA</span></div>
+        <div class="tbody" id="tbody"></div>
+      </div>
+    </div>
+  </div></div>`;
+}
+
+function guideHTML() {
+  return `<div class="guide">
+  <h3>Monte o seu</h3>
+  <p>Leva de 30 a 60 minutos na primeira vez. Depois, abrir o repositório leva segundos.</p>
+  <ol class="steps">
+    <li><div><h5>Instale o VS Code</h5><p>Baixe em <a href="https://code.visualstudio.com" target="_blank" rel="noopener">code.visualstudio.com</a>, instale e abra.</p></div></li>
+    <li><div><h5>Abra o terminal dentro dele</h5><p>Menu <b>Terminal → New Terminal</b>. A área de comandos aparece embaixo.</p></div></li>
+    <li><div><h5>Instale o Claude Code</h5><p>Cole o comando do seu sistema no terminal e aperte Enter. É preciso ter um plano pago do Claude (Pro ou Max). Na primeira vez que você digitar <code>claude</code>, ele pede para você entrar na sua conta. Instruções oficiais: <a href="https://docs.claude.com/en/docs/claude-code/setup" target="_blank" rel="noopener">docs.claude.com</a>.</p>
+      <div class="copy"><small>Mac ou Linux</small>curl -fsSL https://claude.ai/install.sh | bash<button data-copy="curl -fsSL https://claude.ai/install.sh | bash">Copiar</button></div>
+      <div class="copy"><small>Windows (PowerShell)</small>irm https://claude.ai/install.ps1 | iex<button data-copy="irm https://claude.ai/install.ps1 | iex">Copiar</button></div></div></li>
+    <li><div><h5>Crie a pasta do seu assunto</h5><p>Troque <code>meu-assunto</code> por um nome curto, sem espaços nem acentos. Depois, no terminal da janela que abrir, digite <code>claude</code>.</p>
+      <div class="copy">mkdir meu-assunto
+cd meu-assunto
+code .<button data-copy="mkdir meu-assunto&#10;cd meu-assunto&#10;code .">Copiar</button></div></div></li>
+    <li><div><h5>Cole o roteiro e responda à entrevista</h5><p>O Claude cria o CLAUDE.md, as pastas e os comandos <code>/debrief</code> e <code>/backup</code>.</p>
+      <div class="copy long" id="roteiro">${esc(ROTEIRO)}<button data-copy-id="roteiro">Copiar</button></div></div></li>
+    <li><div><h5>Use o ciclo</h5><p>Abrir, conversar, <code>/debrief</code>, <code>/backup</code>. O <code>/backup</code> precisa de uma conta gratuita no <a href="https://github.com/signup" target="_blank" rel="noopener">GitHub</a>. Se não quiser criar agora, use só o <code>/debrief</code>: seus arquivos ficam no seu computador.</p></div></li>
+  </ol>
+  <div class="contact"><b>Quer ajuda para montar o seu?</b><p>Ofereço uma consultoria individual para montar o seu repositório junto com você. Contato: [a definir]</p></div>
+</div>`;
+}
+
+/* ---------- Terminal ---------- */
+function lineEl(l) {
+  const d = document.createElement("div");
+  d.className = "ln";
+  if (l.t === "prompt") d.innerHTML = `<span class="ps">${esc(l.ps)}</span> <span class="tx"></span>`;
+  else if (l.t === "user") { d.classList.add("user"); d.innerHTML = `<span class="gt">&gt;</span> <span class="tx"></span>`; }
+  else if (l.t === "paste") { d.classList.add("user"); d.innerHTML = `<span class="gt">&gt;</span> <span class="paste">${esc(l.c)}</span>`; }
+  else if (l.t === "claude") { d.classList.add("claude"); d.innerHTML = `<span class="dot">●</span><span>${inline(l.c)}</span>`; }
+  else if (l.t === "tool") { d.classList.add("tool"); if (l.ok) d.classList.add("ok"); d.innerHTML = `⎿ ${inline(l.c)}`; }
+  else if (l.t === "box") { d.innerHTML = `<div class="box"><b>✻ Claude Code</b><div>pasta: ~/reforma-apartamento</div></div>`; }
+  return d;
+}
+const typed = l => l.t === "prompt" || l.t === "user";
+function promptEl(s) {
+  const d = document.createElement("div"); d.className = "ln";
+  d.innerHTML = s.claude ? `<span class="gt">&gt;</span> <span class="cursor"></span>` : `<span class="ps">${esc(s.ps)}</span> <span class="cursor"></span>`;
+  return d;
+}
+async function fillTerm(s, from, token) {
+  const tb = $("tbody"); if (!tb) return;
+  const scroll = () => { tb.scrollTop = tb.scrollHeight; };
+  s.term.forEach((l, i) => {
+    if (i >= from) return;
+    const e = lineEl(l); if (typed(l)) e.querySelector(".tx").textContent = l.c; tb.appendChild(e);
+  });
+  for (let i = from; i < s.term.length; i++) {
+    const l = s.term[i];
+    if (token !== animToken) return;
+    if (typed(l)) {
+      const e = lineEl(l), tx = e.querySelector(".tx"), cur = promptEl(s);
+      tb.appendChild(e); scroll();
+      for (const ch of l.c) {
+        if (token !== animToken) return;
+        tx.textContent += ch; await sleep(l.c.length > 40 ? 12 : 32);
+      }
+      await sleep(260);
+    } else {
+      await sleep(l.t === "claude" ? 520 : 240);
+      if (token !== animToken) return;
+      tb.appendChild(lineEl(l)); scroll();
+    }
+  }
+  tb.appendChild(promptEl(s)); scroll();
+}
+
+/* ---------- Navegação ---------- */
+let cur = 0, animToken = 0;
+
+function go(i, animate) {
+  i = Math.max(0, Math.min(STEPS.length - 1, i));
+  const forward = animate && i === cur + 1 && !reduce;
+  const prev = forward ? replay(cur) : null;
+  cur = i;
+  const s = replay(i), st = STEPS[i];
+  animToken++;
+
+  $("eyebrow").textContent = `Parte ${st.ch + 1} de ${CHAPTERS.length} · ${CHAPTERS[st.ch]}`;
+  $("ntitle").textContent = st.title;
+  $("ntext").innerHTML = st.body;
+  $("ntext").scrollTop = 0;
+  $("count").textContent = `${i + 1} / ${STEPS.length}`;
+  $("prev").disabled = i === 0;
+  $("next").textContent = i === STEPS.length - 1 ? "Recomeçar" : "Próximo";
+  $("chapters").querySelectorAll(".chap").forEach((b, k) => {
+    b.classList.toggle("now", k === st.ch); b.classList.toggle("done", k < st.ch);
+  });
+
+  const scr = $("screen");
+  if (s.mode === "chat") scr.innerHTML = chatHTML();
+  else if (s.mode === "desktop") scr.innerHTML = desktopHTML(s);
+  else if (s.mode === "guide") scr.innerHTML = guideHTML();
+  else {
+    scr.innerHTML = vsHTML(s);
+    const from = prev && prev.mode === "vs" || prev && prev.term.length === 0 ? Math.min(prev.term.length, s.term.length) : s.term.length;
+    fillTerm(s, from, animToken);
+    const ed = $("editor"), mark = ed && ed.querySelector(".eline.hl, .eline.ref");
+    if (mark) ed.scrollTop = Math.max(0, mark.offsetTop - 60);
+  }
+  if (!forward) { s.fresh = []; }
+}
+
+$("chapters").innerHTML = CHAPTERS.map((c, k) => `<button class="chap" data-ch="${k}">${k + 1}. ${c}</button>`).join("");
+$("chapters").addEventListener("click", e => {
+  const b = e.target.closest(".chap"); if (!b) return;
+  go(STEPS.findIndex(st => st.ch === +b.dataset.ch), false);
+});
+$("next").addEventListener("click", () => cur === STEPS.length - 1 ? go(0, false) : go(cur + 1, true));
+$("prev").addEventListener("click", () => go(cur - 1, false));
+document.addEventListener("keydown", e => {
+  if (e.target.closest("input, textarea")) return;
+  if (e.key === "ArrowRight") { e.preventDefault(); if (cur < STEPS.length - 1) go(cur + 1, true); }
+  if (e.key === "ArrowLeft") { e.preventDefault(); go(cur - 1, false); }
+});
+$("screen").addEventListener("click", async e => {
+  const b = e.target.closest("button[data-copy], button[data-copy-id]"); if (!b) return;
+  const text = b.dataset.copy ?? ROTEIRO;
+  try { await navigator.clipboard.writeText(text); b.textContent = "Copiado"; }
+  catch { b.textContent = "Selecione e copie"; }
+  setTimeout(() => { b.textContent = "Copiar"; }, 1800);
+});
+
+go(0, false);
+</script>
+</body>
+</html>
