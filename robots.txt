@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /laboratorio/
+
+Sitemap: https://contexto-na-pratica.vercel.app/sitemap.xml
