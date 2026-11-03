@@ -232,6 +232,10 @@ code { font-family: var(--font-mono); font-size: .88em; }
 .dlg-foot .grow { flex: 1; }
 .dlg-btn { border: 1px solid #c9ccc9; background: #fff; border-radius: 6px; padding: 4px 12px; }
 .dlg-btn.pri { background: #141518; color: #fff; border-color: #141518; }
+.dlg-row.naming { box-shadow: 0 0 0 3px var(--spot); }
+.dlg-row.naming .ghost { color: #8b919b; }
+.dlg-row.naming .cursor { height: 13px; vertical-align: -1px; margin: 0 1px; }
+.dlg-row.naming.shake { animation: shake .28s ease-in-out; }
 .spotb { box-shadow: 0 0 0 3px var(--spot); animation: pulseb 1.6s ease-in-out infinite; }
 @keyframes pulseb { 50% { box-shadow: 0 0 0 3px rgba(255,158,122,.4); } }
 @media (max-width: 600px) { .dlg-body { grid-template-columns: minmax(0, 1fr); } .dlg-side { display: none; } }
@@ -1565,15 +1569,20 @@ function buildSteps(T) {
 <li><b>Terminal:</b> onde você conversa com o Claude. Se ele não estiver aparecendo, use o menu Terminal → New Terminal.</li></ol>`,
     apply: s => { s.mode = "vs"; s.labels = true; } },
 
-  { ch: 1, title: "Criando a pasta, sem digitar nada",
-    act: { kind: "click", target: "openbtn", do: "Clique em <b>Abrir pasta</b>, no Explorador." },
-    body: `<p>Abriu a mesma janela que você já usa para abrir qualquer arquivo do computador (no VS Code de verdade, também dá para usar o menu File → Open Folder).</p>
-<p>Escolha onde guardar, por exemplo em <b>Documentos</b>, clique em <b>Nova pasta</b> e dê um nome a ela: <b>${T.folder}</b>.</p>
+  { ch: 1, title: "Criando a pasta",
+    act: { stages: [
+      { kind: "click", target: "openbtn", do: "Clique em <b>Abrir pasta</b>, no Explorador.",
+        after: s => { s.dialog = true; s.dlg = "vazia"; } },
+      { kind: "click", target: "dlgnew", do: "Abriu a mesma janela que você já usa para abrir qualquer arquivo do computador. Você está em <b>Documentos</b>. Clique em <b>Nova pasta</b>.",
+        after: s => { s.dialog = true; s.dlg = "nomeando"; } },
+      { kind: "type", inDialog: true, word: T.folder, do: `Dê um nome à pasta: digite <b>${T.folder}</b> e aperte <b>Enter</b>.` },
+    ] },
+    body: `<p>A pasta <b>${T.folder}</b> foi criada dentro de <b>Documentos</b>. No VS Code de verdade, essa janela também abre pelo menu File → Open Folder.</p>
 <p>Prefira um nome curto, sem espaços nem acentos. Se quiser uma cópia de segurança automática, crie a pasta dentro do <b>Google Drive</b>, do <b>OneDrive</b> ou do <b>iCloud Drive</b>.</p>`,
-    apply: s => { s.dialog = true; } },
+    apply: s => { s.dialog = true; s.dlg = "criada"; } },
 
   { ch: 1, title: "A pasta aberta",
-    act: { kind: "click", target: "dlgopen", do: `A pasta <b>${T.folder}</b> já foi criada. Clique em <b>Abrir</b>.` },
+    act: { kind: "click", target: "dlgopen", do: `Com a pasta <b>${T.folder}</b> selecionada, clique em <b>Abrir</b>.` },
     body: `<p>O nome da pasta aparece no topo do Explorador. Ela está vazia por enquanto.</p>
 <p>É uma pasta comum do seu computador: se você abrir o Finder (ou o Explorador de Arquivos) e for em Documentos, ela estará lá.</p>
 <p>Repare no terminal: ele já está "dentro" da pasta. Tudo o que o Claude fizer a partir daqui acontece nela.</p>`,
@@ -1733,7 +1742,7 @@ let STEPS = buildSteps(T);
 function fresh() {
   return { mode: "chat", desk: null, folder: null, ps: HOME, files: [], contents: {}, changed: {},
            open: null, tabs: [], term: [], claude: false, dialog: false, focus: null, labels: false, hl: {}, ref: {}, fresh: [],
-           chat: null, preview: false, ex: 0, cp: 0, frozen: false, pnote: null, hold: [], target: null, ghost: null, chip: null };
+           chat: null, dlg: null, preview: false, ex: 0, cp: 0, frozen: false, pnote: null, hold: [], target: null, ghost: null, chip: null };
 }
 function replay(i) {
   const s = fresh();
@@ -1900,10 +1909,12 @@ function dialogHTML(s) {
         <div class="dlg-path">Documentos</div>
         <div class="dlg-row"><i></i>Fotos da viagem</div>
         <div class="dlg-row"><i></i>Impostos 2026</div>
-        <div class="dlg-row sel"><i></i>${T.folder}<em>nova pasta</em></div>
+        ${s.dlg === "vazia" ? ""
+          : s.dlg === "nomeando" ? `<div class="dlg-row sel naming" data-act><i></i><span class="nm-in"><span class="typed" id="typed"></span><span class="cursor"></span><span class="ghost" id="ghost">${esc(T.folder)}</span></span></div>`
+          : `<div class="dlg-row sel"><i></i>${T.folder}<em>nova pasta</em></div>`}
       </div>
     </div>
-    <div class="dlg-foot"><span class="dlg-btn ${abrir ? "" : "spotb"}">Nova pasta</span><span class="grow"></span><span class="dlg-btn">Cancelar</span><span class="dlg-btn pri ${abrir ? "spotb" : ""}"${abrir ? " data-act" : ""}>Abrir</span></div>
+    <div class="dlg-foot"><span class="dlg-btn ${s.target === "dlgnew" ? "spotb" : ""}"${s.target === "dlgnew" ? " data-act" : ""}>Nova pasta</span><span class="grow"></span><span class="dlg-btn">Cancelar</span><span class="dlg-btn pri ${abrir ? "spotb" : ""}"${abrir ? " data-act" : ""}>Abrir</span></div>
   </div></div>`;
 }
 
@@ -2033,7 +2044,9 @@ async function fillTerm(s, from, token, instantFirst = false) {
 
 /* ---------- Navegação ---------- */
 let cur = 0, animToken = 0;
-let pending = false, typedN = 0;
+let pending = false, typedN = 0, stage = 0;
+/* A ação ativa: a etapa atual, quando o passo tem várias */
+const curAct = () => { const a = STEPS[cur].act; return a && a.stages ? a.stages[stage] : a; };
 const acted = new Set();
 
 /* "/" é a home e "/concluido" a tela final. Cada passo tem um endereço próprio
@@ -2180,19 +2193,8 @@ function go(i, animate, push = true) {
 
   /* Passo com ação: mostra a tela de antes, com o alvo destacado, até a pessoa agir */
   if (stepForward && st.act && !acted.has(i)) {
-    pending = true; typedN = 0;
-    const s = replay(i - 1);
-    s.focus = null; s.labels = false; s.fresh = []; s.hl = {}; s.ref = {};
-    if (st.act.pre) st.act.pre(s);
-    if (st.act.kind === "click") s.target = st.act.target;
-    if (st.act.kind === "type") s.ghost = st.act.word;
-    if (st.act.kind === "chip") s.chip = st.act.label;
-    setNarr(i, st, `<p class="do">${st.act.do}</p>`);
-    $("next").textContent = "Próximo"; $("next").disabled = true;
-    $("hint").textContent = st.act.kind !== "type" ? "Faça a ação na tela para continuar"
-      : matchMedia("(pointer: coarse)").matches ? "Toque na linha do terminal" : "Digite no teclado";
-    renderScreen(s, null, false);
-    renderPlacar(s, null);
+    pending = true; stage = 0;
+    renderPending(i);
     return;
   }
   pending = false;
@@ -2207,6 +2209,31 @@ function show(i, prev, instantFirst) {
   $("hint").textContent = "Dica: use as setas ← → do teclado";
   renderScreen(s, prev, instantFirst);
   renderPlacar(s, prev ? replay(i - 1) : null);
+}
+
+function renderPending(i) {
+  const st = STEPS[i], a = curAct();
+  typedN = 0;
+  const s = replay(i - 1);
+  s.focus = null; s.labels = false; s.fresh = []; s.hl = {}; s.ref = {};
+  if (st.act.pre) st.act.pre(s);
+  if (st.act.stages) st.act.stages.slice(0, stage).forEach(x => x.after && x.after(s));
+  if (a.kind === "click") s.target = a.target;
+  if (a.kind === "type" && !a.inDialog) s.ghost = a.word;
+  if (a.kind === "chip") s.chip = a.label;
+  setNarr(i, st, `<p class="do">${a.do}</p>`);
+  $("next").textContent = "Próximo"; $("next").disabled = true;
+  $("hint").textContent = a.kind !== "type" ? "Faça a ação na tela para continuar"
+    : matchMedia("(pointer: coarse)").matches ? (a.inDialog ? "Toque no nome da pasta" : "Toque na linha do terminal") : "Digite no teclado";
+  renderScreen(s, null, false);
+  renderPlacar(s, null);
+}
+
+/* Conclui a etapa atual; quando é a última, conclui a ação do passo */
+function advance() {
+  const a = STEPS[cur].act;
+  if (a.stages && stage < a.stages.length - 1) { stage++; renderPending(cur); return; }
+  doAct();
 }
 
 function doAct() {
@@ -2237,7 +2264,7 @@ document.addEventListener("click", e => {
 document.addEventListener("keydown", e => {
   if (document.body.classList.contains("is-landing") || document.body.classList.contains("is-done")) return;
   if (e.target.closest?.("input, textarea, select")) return;
-  const act = pending && STEPS[cur].act;
+  const act = pending && curAct();
   if (act && act.kind === "type") {
     /* Digitação de verdade: só a letra certa entra; Enter só com a palavra completa */
     const t = $("typed"), g = $("ghost"), w = act.word, done = typedN === w.length;
@@ -2245,8 +2272,8 @@ document.addEventListener("keydown", e => {
       if (t && g) { t.textContent = w.slice(0, typedN); g.textContent = w.slice(typedN); }
       $("hint").textContent = typedN === w.length ? "Agora aperte Enter" : "Digite no teclado";
     };
-    const shake = () => { const l = t && t.closest(".ln"); if (!l) return; l.classList.remove("shake"); void l.offsetWidth; l.classList.add("shake"); };
-    if (e.key === "Enter") { e.preventDefault(); return done ? doAct() : shake(); }
+    const shake = () => { const l = t && t.closest(".ln, .dlg-row"); if (!l) return; l.classList.remove("shake"); void l.offsetWidth; l.classList.add("shake"); };
+    if (e.key === "Enter") { e.preventDefault(); return done ? advance() : shake(); }
     if (e.key === "Backspace") { e.preventDefault(); typedN = Math.max(0, typedN - 1); return update(); }
     if (e.key.length === 1 && !e.metaKey && !e.ctrlKey && !e.altKey) {
       e.preventDefault();
@@ -2260,8 +2287,8 @@ document.addEventListener("keydown", e => {
 $("screen").addEventListener("click", async e => {
   if (pending && e.target.closest("[data-act]")) {
     /* Digitar exige teclado; tocar na linha só conclui em tela de toque */
-    if (STEPS[cur].act.kind === "type" && !matchMedia("(pointer: coarse)").matches) return;
-    return doAct();
+    if (curAct().kind === "type" && !matchMedia("(pointer: coarse)").matches) return;
+    return advance();
   }
   const b = e.target.closest("button[data-copy], button[data-copy-id]"); if (!b) return;
   const text = b.dataset.copy ?? ROTEIRO;
