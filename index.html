@@ -759,8 +759,19 @@ async function fillTerm(s, from, token) {
 /* ---------- Navegação ---------- */
 let cur = 0, animToken = 0;
 
-function go(i, animate) {
+/* Cada passo tem um endereço próprio (/passo-N) para o Vercel Analytics
+   contar quantas pessoas chegaram a cada passo. O passo 1 é "/". */
+const pathFor = i => i === 0 ? "/" : `/passo-${i + 1}`;
+function stepFromPath() {
+  const m = location.pathname.match(/^\/passo-(\d+)\/?$/);
+  return m ? Math.max(0, Math.min(STEPS.length - 1, +m[1] - 1)) : 0;
+}
+
+function go(i, animate, push = true) {
   i = Math.max(0, Math.min(STEPS.length - 1, i));
+  if (push && location.pathname !== pathFor(i)) {
+    try { history.pushState(null, "", pathFor(i)); } catch { /* arquivo local ou prévia: sem endereço por passo */ }
+  }
   const forward = animate && i === cur + 1 && !reduce;
   const prev = forward ? replay(cur) : null;
   cur = i;
@@ -812,7 +823,8 @@ $("screen").addEventListener("click", async e => {
   setTimeout(() => { b.textContent = "Copiar"; }, 1800);
 });
 
-go(0, false);
+window.addEventListener("popstate", () => go(stepFromPath(), false, false));
+go(stepFromPath(), false, false);
 </script>
 <!-- Vercel Speed Insights (só funciona no site publicado no Vercel) -->
 <script>

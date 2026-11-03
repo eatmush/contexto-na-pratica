@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/passo-:n", "destination": "/index.html" }
+  ]
+}
