@@ -2275,7 +2275,9 @@ document.addEventListener("keydown", e => {
     const shake = () => { const l = t && t.closest(".ln, .dlg-row"); if (!l) return; l.classList.remove("shake"); void l.offsetWidth; l.classList.add("shake"); };
     if (e.key === "Enter") { e.preventDefault(); return done ? advance() : shake(); }
     if (e.key === "Backspace") { e.preventDefault(); typedN = Math.max(0, typedN - 1); return update(); }
-    if (e.key.length === 1 && !e.metaKey && !e.ctrlKey && !e.altKey) {
+    /* Aceita o caractere que o teclado produziu, mesmo com Option/Alt ou AltGr
+       (ex.: a barra é Option+Q em alguns teclados Mac); ignora só atalhos Cmd/Ctrl. */
+    if (e.key.length === 1 && !e.metaKey && (!e.ctrlKey || e.altKey)) {
       e.preventDefault();
       if (!done && e.key.toLowerCase() === w[typedN].toLowerCase()) { typedN++; update(); } else shake();
       return;
