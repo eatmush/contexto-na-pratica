@@ -419,7 +419,7 @@ content: "← "; color: var(--ink); }
 background: var(--lime); border-radius: 4px; padding: 0 4px; justify-self: start; }
 
 .landing .ritual {
-display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; counter-reset: r; }
+display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; counter-reset: r; }
 
 .landing .ritual > div {
 counter-increment: r; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; display: flex; flex-direction: column; gap: 4px; }
@@ -644,7 +644,7 @@ body:not(.is-landing) .landing { display: none; }
   <section class="hero">
     <div class="kicker">uma história curta sobre IA e memória</div>
     <h1>Você já contou a mesma história para a IA. <span class="hl">Mais de uma vez.</span></h1>
-    <p>Este site mostra, em 20 passos, como fazer o Claude lembrar do seu assunto de uma conversa para outra. Sem programar, e com um exemplo de verdade:
+    <p>Este site mostra, em 19 passos, como fazer o Claude lembrar do seu assunto de uma conversa para outra. Sem programar, e com um exemplo de verdade:
       <label class="pick-wrap"><span class="sr">Escolha o exemplo</span><select id="tema" class="tema">
         <option value="reforma">a reforma de um apartamento</option>
         <option value="confeitaria">uma confeitaria por encomenda</option>
@@ -717,7 +717,7 @@ body:not(.is-landing) .landing { display: none; }
     <section class="chapter">
       <div>
         <span class="day">toda vez</span>
-        <h2>Um ritual de quatro passos</h2>
+        <h2>Um ritual de três passos</h2>
         <p>O caderno não se escreve sozinho, mas quase. A cada conversa, o Claude propõe o que anotar e você só aprova.</p>
         <p class="aside">A cada volta, o caderno fica mais completo e a IA começa sabendo mais.</p>
       </div>
@@ -725,7 +725,6 @@ body:not(.is-landing) .landing { display: none; }
         <div><b>Abrir</b><span>a pasta do assunto</span></div>
         <div><b>Conversar</b><span>sobre o que surgiu</span></div>
         <div><b><code>/debrief</code></b><span>o Claude propõe o que anotar</span></div>
-        <div><b><code>/backup</code></b><span>uma cópia de segurança</span></div>
       </div>
     </section>
   </div>
@@ -748,7 +747,7 @@ body:not(.is-landing) .landing { display: none; }
         <div class="ask">Mas eu já uso os Projetos do ChatGPT ou do Claude.</div>
         <div class="ans">
           <p>Eles resolvem parte disso: os arquivos que você sobe valem em toda conversa do projeto. Só que quem mantém esses arquivos em dia é você, à mão, e eles ficam dentro do serviço.</p>
-          <p>No caderno, o Claude propõe as atualizações e você aprova. Tudo fica no seu computador, com o histórico de cada mudança.</p>
+          <p>No caderno, o Claude propõe as atualizações e você aprova. E tudo fica numa pasta sua, no seu computador.</p>
           <details>
             <summary>Ver a comparação completa</summary>
             <div class="vs-table" role="table" aria-label="Projeto comparado a repositório de contexto">
@@ -761,9 +760,9 @@ body:not(.is-landing) .landing { display: none; }
               <div class="k" role="rowheader">Onde as informações ficam</div>
               <div role="cell">Dentro da sua conta no serviço.</div>
               <div class="ours" role="cell">Numa pasta no seu computador.</div>
-              <div class="k" role="rowheader">Histórico de mudanças</div>
-              <div role="cell">Só a versão atual.</div>
-              <div class="ours" role="cell">Cada mudança guardada (<code>/backup</code>).</div>
+              <div class="k" role="rowheader">Cópia de segurança</div>
+              <div role="cell">Fica com o serviço.</div>
+              <div class="ours" role="cell">A pasta pode ficar no Drive, no OneDrive ou no iCloud que você já usa.</div>
               <div class="k" role="rowheader">Se trocar de ferramenta</div>
               <div role="cell">O projeto fica para trás.</div>
               <div class="ours" role="cell">Você leva a pasta.</div>
@@ -823,7 +822,7 @@ body:not(.is-landing) .landing { display: none; }
 
   <section class="final">
     <h2>Bora montar o <span class="hl">caderno da sua IA?</span></h2>
-    <p>O passo a passo mostra tudo numa simulação da tela do computador, do primeiro arquivo ao primeiro backup.</p>
+    <p>O passo a passo mostra tudo numa simulação da tela do computador, do primeiro arquivo ao primeiro <code>/debrief</code>.</p>
     <a class="btn" href="/passo-1" data-step="0">Começar o passo a passo</a>
   </section>
   <p class="foot">exemplo usado no passo a passo: <span data-t="label">a reforma de um apartamento</span> · quer ajuda para montar o seu? <a href="https://www.linkedin.com/in/matcastella/" target="_blank" rel="noopener">fale comigo no linkedin</a></p>
@@ -917,8 +916,7 @@ const THEMES = {
    "orcamentos/pedreiro-joao.md",
    "plano/proximos-passos.md",
    "atas/",
-   ".claude/commands/debrief.md",
-   ".claude/commands/backup.md"
+   ".claude/commands/debrief.md"
   ],
   "factsFile": "decisoes/escolhas.md",
   "factsRef": [
@@ -960,14 +958,13 @@ const THEMES = {
   ],
   "updateNote": "Na próxima conversa, o Claude já vai saber que você está esperando os outros orçamentos.",
   "F": {
-   "CLAUDE.md": "# CLAUDE.md\n\nEste arquivo orienta o Claude Code neste repositório.\n\n## O que é este repositório\n\nContexto da reforma do meu apartamento: cozinha e\nbanheiro social. Estágio atual: recebendo orçamentos,\nainda não fechei com ninguém.\n\n## Sobre mim\n\n- **Papel:** dono do apartamento, coordeno a obra\n  sem arquiteto\n- **Restrições:** R$ 45.000 no total; a obra precisa\n  terminar até março\n- **Conhecimento de obra:** nenhum. Risco: aceitar\n  um orçamento ruim por não saber comparar\n\n**Preferências de comunicação:**\n- Direto, sem rodeio\n- Me avise quando um gasto ameaçar o orçamento total\n\n## Estrutura do repositório\n\norcamentos/  → propostas recebidas, uma por fornecedor\ndecisoes/    → o que já foi decidido e por quê\nplano/       → próximos passos e prazos\natas/        → conversas com fornecedores e visitas\n\n## Comandos disponíveis\n\n- `/debrief` — revisa a conversa e propõe o que guardar.\n  Pede aprovação antes de escrever.\n- `/backup` — salva uma cópia de segurança no GitHub.\n\n## Como me ajudar\n\n- Orçamento novo → registrar em `orcamentos/` e comparar\n  com o teto do item em `decisoes/escolhas.md`\n- Toda decisão → `decisoes/escolhas.md`, com o motivo\n- Prazos e pendências → `plano/proximos-passos.md`",
+   "CLAUDE.md": "# CLAUDE.md\n\nEste arquivo orienta o Claude Code neste repositório.\n\n## O que é este repositório\n\nContexto da reforma do meu apartamento: cozinha e\nbanheiro social. Estágio atual: recebendo orçamentos,\nainda não fechei com ninguém.\n\n## Sobre mim\n\n- **Papel:** dono do apartamento, coordeno a obra\n  sem arquiteto\n- **Restrições:** R$ 45.000 no total; a obra precisa\n  terminar até março\n- **Conhecimento de obra:** nenhum. Risco: aceitar\n  um orçamento ruim por não saber comparar\n\n**Preferências de comunicação:**\n- Direto, sem rodeio\n- Me avise quando um gasto ameaçar o orçamento total\n\n## Estrutura do repositório\n\norcamentos/  → propostas recebidas, uma por fornecedor\ndecisoes/    → o que já foi decidido e por quê\nplano/       → próximos passos e prazos\natas/        → conversas com fornecedores e visitas\n\n## Comandos disponíveis\n\n- `/debrief` — revisa a conversa e propõe o que guardar.\n  Pede aprovação antes de escrever.\n\n## Como me ajudar\n\n- Orçamento novo → registrar em `orcamentos/` e comparar\n  com o teto do item em `decisoes/escolhas.md`\n- Toda decisão → `decisoes/escolhas.md`, com o motivo\n- Prazos e pendências → `plano/proximos-passos.md`",
    "decisoes/escolhas.md": "# Escolhas da reforma\n\n## Já decidido\n\n- Piso da cozinha: porcelanato 60x60 cinza claro.\n  Motivo: mais fácil de limpar e 30% mais barato\n  que o 90x90\n- Banheiro: trocar a banheira por box, para ganhar\n  espaço\n\n## Teto por item (soma: R$ 45.000)\n\n- Marcenaria (armários da cozinha): R$ 12.000\n- Revestimentos e piso: R$ 9.000\n- Mão de obra do pedreiro: R$ 14.000\n- Elétrica e hidráulica: R$ 6.000\n- Reserva para imprevistos: R$ 4.000",
    "orcamentos/pedreiro-joao.md": "# Pedreiro — João\n\n- Valor: R$ 13.500 (teto: R$ 14.000)\n- Começa em 05/12, duração de 10 semanas\n- Status: bom candidato, falta pedir referências",
    "plano/proximos-passos.md": "# Próximos passos\n\n- [ ] Pedir 3 orçamentos de marcenaria (até 15/11)\n- [ ] Visita do eletricista (20/11)\n- [ ] Fechar o pedreiro antes de dezembro (agenda lota)",
    "plano/proximos-passos.md@2": "# Próximos passos\n\n- [ ] Pedir 3 orçamentos de marcenaria (até 15/11)\n      Recebido: Paulo. Faltam 2.\n- [ ] Decidir a marcenaria só depois dos 3 orçamentos\n- [ ] Visita do eletricista (20/11)\n- [ ] Fechar o pedreiro antes de dezembro (agenda lota)",
    "orcamentos/marcenaria-paulo.md": "# Marcenaria — Paulo\n\nRecebido em 08/11.\n\n- Armários da cozinha em MDF laca: R$ 15.800\n- Mesmo projeto em MDF texturizado: R$ 12.900\n- Teto planejado para marcenaria: R$ 12.000\n\nStatus: aguardando os outros 2 orçamentos antes\nde decidir.",
-   ".claude/commands/debrief.md": "---\ndescription: Revisa a conversa e propõe o que guardar\n---\n\nRevise esta conversa e identifique o que vale guardar\nno repositório: orçamentos novos, decisões, prazos.\n\nPara cada item, diga o que é, em qual arquivo vai\nficar e mostre um rascunho. Espere minha aprovação\nantes de escrever qualquer arquivo.",
-   ".claude/commands/backup.md": "---\ndescription: Salva uma cópia de segurança no GitHub\n---\n\nConfira o que mudou desde a última cópia, salve as\nmudanças com uma descrição curta e envie para o\nGitHub. Se encontrar algo que pareça senha ou dado\nsensível, pare e me avise antes."
+   ".claude/commands/debrief.md": "---\ndescription: Revisa a conversa e propõe o que guardar\n---\n\nRevise esta conversa e identifique o que vale guardar\nno repositório: orçamentos novos, decisões, prazos.\n\nPara cada item, diga o que é, em qual arquivo vai\nficar e mostre um rascunho. Espere minha aprovação\nantes de escrever qualquer arquivo."
   },
   "home": {
    "c1": "Você decide reformar a cozinha. Abre o chat e conta tudo: o orçamento de R$ 45 mil, o prazo até março, o pedreiro que cobrou R$ 13.500, o piso que já escolheu.",
@@ -1095,8 +1092,7 @@ const THEMES = {
    "clientes/clientes-frequentes.md",
    "plano/proximos-passos.md",
    "atas/",
-   ".claude/commands/debrief.md",
-   ".claude/commands/backup.md"
+   ".claude/commands/debrief.md"
   ],
   "factsFile": "decisoes/regras.md",
   "factsRef": [
@@ -1138,15 +1134,14 @@ const THEMES = {
   ],
   "updateNote": "Na próxima conversa, o Claude já vai saber do pedido do casamento e do sinal que falta cobrar.",
   "F": {
-   "CLAUDE.md": "# CLAUDE.md\n\nEste arquivo orienta o Claude Code neste repositório.\n\n## O que é este repositório\n\nContexto da minha confeitaria por encomenda: doces\nfeitos em casa, vendidos para festas e eventos.\nEstágio atual: organizando preços e regras para\ncrescer sem perder dinheiro.\n\n## Sobre mim\n\n- **Papel:** produção, vendas e entregas, tudo por\n  minha conta\n- **Restrições:** cozinha de casa, até 600 doces por\n  semana\n- **Conhecimento de preço:** nunca calculei com\n  método. Risco: dar desconto demais sem perceber\n\n**Preferências de comunicação:**\n- Direto, sem rodeio\n- Me avise quando um pedido ficar abaixo da margem\n\n## Estrutura do repositório\n\nprecos/     → custo e preço de cada receita\nclientes/   → quem compra, o quê e quando\ndecisoes/   → regras do negócio, e por quê\nplano/      → encomendas e próximos passos\natas/       → conversas com clientes e fornecedores\n\n## Comandos disponíveis\n\n- `/debrief` — revisa a conversa e propõe o que guardar.\n  Pede aprovação antes de escrever.\n- `/backup` — salva uma cópia de segurança no GitHub.\n\n## Como me ajudar\n\n- Pedido ou desconto → conferir com `precos/receitas.md`\n  e com as regras em `decisoes/regras.md`\n- Toda regra nova → `decisoes/regras.md`, com o motivo\n- Encomendas e prazos → `plano/proximos-passos.md`",
+   "CLAUDE.md": "# CLAUDE.md\n\nEste arquivo orienta o Claude Code neste repositório.\n\n## O que é este repositório\n\nContexto da minha confeitaria por encomenda: doces\nfeitos em casa, vendidos para festas e eventos.\nEstágio atual: organizando preços e regras para\ncrescer sem perder dinheiro.\n\n## Sobre mim\n\n- **Papel:** produção, vendas e entregas, tudo por\n  minha conta\n- **Restrições:** cozinha de casa, até 600 doces por\n  semana\n- **Conhecimento de preço:** nunca calculei com\n  método. Risco: dar desconto demais sem perceber\n\n**Preferências de comunicação:**\n- Direto, sem rodeio\n- Me avise quando um pedido ficar abaixo da margem\n\n## Estrutura do repositório\n\nprecos/     → custo e preço de cada receita\nclientes/   → quem compra, o quê e quando\ndecisoes/   → regras do negócio, e por quê\nplano/      → encomendas e próximos passos\natas/       → conversas com clientes e fornecedores\n\n## Comandos disponíveis\n\n- `/debrief` — revisa a conversa e propõe o que guardar.\n  Pede aprovação antes de escrever.\n\n## Como me ajudar\n\n- Pedido ou desconto → conferir com `precos/receitas.md`\n  e com as regras em `decisoes/regras.md`\n- Toda regra nova → `decisoes/regras.md`, com o motivo\n- Encomendas e prazos → `plano/proximos-passos.md`",
    "precos/receitas.md": "# Receitas: custo e preço\n\n## Brigadeiro gourmet\n- Custo por unidade: R$ 1,80\n- Preço de venda: R$ 3,50\n- Margem: 49%\n\n## Bem-casado\n- Custo por unidade: R$ 2,40\n- Preço de venda: R$ 5,00\n- Margem: 52%\n\n## Cupcake\n- Custo por unidade: R$ 4,10\n- Preço de venda: R$ 8,00\n- Margem: 49%",
    "decisoes/regras.md": "# Regras do negócio\n\n## Já decidido\n\n- Margem mínima de 40% em qualquer pedido.\n  Motivo: abaixo disso, o pedido não paga as\n  horas de trabalho\n- Pedido mínimo: 50 unidades, com 5 dias de\n  antecedência\n- Sinal de 50% para confirmar o pedido\n- Entrega só na zona sul. Fora dela, retirada\n  no local",
    "clientes/clientes-frequentes.md": "# Clientes frequentes\n\n- Ana Paula: festas infantis, pede todo mês\n- Buffet Estrela: casamentos, pedidos de 300+\n- Escritório Lima: coffee break às sextas",
    "plano/proximos-passos.md": "# Próximos passos\n\n- [ ] Buffet Estrela: 300 bem-casados (até 20/11)\n- [ ] Testar receita de brigadeiro de pistache\n- [ ] Comprar embalagens para dezembro (até 25/11)",
    "plano/proximos-passos.md@2": "# Próximos passos\n\n- [ ] Buffet Estrela: 300 bem-casados (até 20/11)\n- [ ] Casamento: 200 brigadeiros (entrega 22/11)\n      Cobrar o sinal de R$ 315 antes de comprar\n- [ ] Testar receita de brigadeiro de pistache\n- [ ] Comprar embalagens para dezembro (até 25/11)",
    "clientes/pedido-casamento-22-11.md": "# Pedido — casamento (22/11)\n\n- 200 brigadeiros gourmet\n- Preço: R$ 3,15 por unidade (10% de desconto)\n- Total: R$ 630, sinal de R$ 315\n- Margem: 43%, dentro da regra de 40%\n\nStatus: aguardando o sinal.",
-   ".claude/commands/debrief.md": "---\ndescription: Revisa a conversa e propõe o que guardar\n---\n\nRevise esta conversa e identifique o que vale guardar\nno repositório: pedidos, preços, regras novas, prazos.\n\nPara cada item, diga o que é, em qual arquivo vai\nficar e mostre um rascunho. Espere minha aprovação\nantes de escrever qualquer arquivo.",
-   ".claude/commands/backup.md": "---\ndescription: Salva uma cópia de segurança no GitHub\n---\n\nConfira o que mudou desde a última cópia, salve as\nmudanças com uma descrição curta e envie para o\nGitHub. Se encontrar algo que pareça senha ou dado\nsensível, pare e me avise antes."
+   ".claude/commands/debrief.md": "---\ndescription: Revisa a conversa e propõe o que guardar\n---\n\nRevise esta conversa e identifique o que vale guardar\nno repositório: pedidos, preços, regras novas, prazos.\n\nPara cada item, diga o que é, em qual arquivo vai\nficar e mostre um rascunho. Espere minha aprovação\nantes de escrever qualquer arquivo."
   },
   "home": {
    "c1": "Você vende doces por encomenda e decide organizar o negócio. Abre o chat e conta tudo: o custo de cada receita, a margem mínima de 40%, o pedido mínimo, as clientes que mais compram.",
@@ -1274,8 +1269,7 @@ const THEMES = {
    "decisoes/aprovacoes.md",
    "plano/proximos-passos.md",
    "atas/",
-   ".claude/commands/debrief.md",
-   ".claude/commands/backup.md"
+   ".claude/commands/debrief.md"
   ],
   "factsFile": "marca/tom-de-voz.md",
   "factsRef": [
@@ -1317,15 +1311,14 @@ const THEMES = {
   ],
   "updateNote": "Na próxima conversa, o Claude já vai saber do teste das duas versões e do prazo.",
   "F": {
-   "CLAUDE.md": "# CLAUDE.md\n\nEste arquivo orienta o Claude Code neste repositório.\n\n## O que é este repositório\n\nContexto da campanha de lançamento do protetor solar\nda marca. Estágio atual: definindo o slogan, com\nlançamento em 15/12.\n\n## Sobre mim\n\n- **Papel:** responsável pela comunicação da marca\n- **Restrições:** verba de R$ 80 mil; tudo passa\n  pela aprovação do diretor de marketing\n- **Histórico:** em março, uma comparação de preço\n  com o concorrente virou crise nas redes\n\n**Preferências de comunicação:**\n- Direto, com argumentos que eu possa levar ao diretor\n- Me avise quando uma ideia fugir do tom da marca\n\n## Estrutura do repositório\n\nmarca/         → tom de voz e o que a marca não diz\naprendizados/  → o que funcionou e o que deu errado\ndecisoes/      → o que já foi aprovado, e por quê\nplano/         → entregas e prazos\natas/          → reuniões e alinhamentos\n\n## Comandos disponíveis\n\n- `/debrief` — revisa a conversa e propõe o que guardar.\n  Pede aprovação antes de escrever.\n- `/backup` — salva uma cópia de segurança no GitHub.\n\n## Como me ajudar\n\n- Ideia de texto ou slogan → conferir com\n  `marca/tom-de-voz.md` e `aprendizados/`\n- Toda aprovação → `decisoes/aprovacoes.md`, com o motivo\n- Prazos e entregas → `plano/proximos-passos.md`",
+   "CLAUDE.md": "# CLAUDE.md\n\nEste arquivo orienta o Claude Code neste repositório.\n\n## O que é este repositório\n\nContexto da campanha de lançamento do protetor solar\nda marca. Estágio atual: definindo o slogan, com\nlançamento em 15/12.\n\n## Sobre mim\n\n- **Papel:** responsável pela comunicação da marca\n- **Restrições:** verba de R$ 80 mil; tudo passa\n  pela aprovação do diretor de marketing\n- **Histórico:** em março, uma comparação de preço\n  com o concorrente virou crise nas redes\n\n**Preferências de comunicação:**\n- Direto, com argumentos que eu possa levar ao diretor\n- Me avise quando uma ideia fugir do tom da marca\n\n## Estrutura do repositório\n\nmarca/         → tom de voz e o que a marca não diz\naprendizados/  → o que funcionou e o que deu errado\ndecisoes/      → o que já foi aprovado, e por quê\nplano/         → entregas e prazos\natas/          → reuniões e alinhamentos\n\n## Comandos disponíveis\n\n- `/debrief` — revisa a conversa e propõe o que guardar.\n  Pede aprovação antes de escrever.\n\n## Como me ajudar\n\n- Ideia de texto ou slogan → conferir com\n  `marca/tom-de-voz.md` e `aprendizados/`\n- Toda aprovação → `decisoes/aprovacoes.md`, com o motivo\n- Prazos e entregas → `plano/proximos-passos.md`",
    "marca/tom-de-voz.md": "# Tom de voz\n\n## Como a marca fala\n- Próxima e honesta, como alguém que entende\n  de pele\n- Explica o porquê, sem jargão técnico\n\n## O que a marca não diz\n- Promessa exagerada (\"o melhor\", \"milagroso\")\n- Comparação direta com concorrente\n- Preço como argumento principal",
    "aprendizados/campanhas-anteriores.md": "# Campanhas anteriores\n\n## Hidratante — março\n- O anúncio comparou nosso preço com o do\n  concorrente\n- Virou crise: comentários acusando a marca de\n  desvalorizar o próprio produto\n- Aprendizado: falar de preço só como \"justo\",\n  nunca em comparação\n\n## Linha infantil — julho\n- Vídeos com dermatologistas explicando o produto\n- Melhor engajamento do ano\n- Aprendizado: explicar funciona melhor que prometer",
    "decisoes/aprovacoes.md": "# Aprovações\n\n- Conceito \"proteção que acompanha o seu dia\":\n  aprovado pelo diretor em 28/10\n- Canais: Instagram, TikTok e farmácias parceiras",
    "plano/proximos-passos.md": "# Próximos passos\n\n- [ ] Fechar o slogan (até 12/11)\n- [ ] Roteiro dos vídeos com dermatologistas (até 20/11)\n- [ ] Peças para farmácias parceiras (até 1/12)",
    "plano/proximos-passos.md@2": "# Próximos passos\n\n- [ ] Fechar o slogan (até 12/11)\n      Antes: testar as duas versões nesta semana\n- [ ] Roteiro dos vídeos com dermatologistas (até 20/11)\n- [ ] Peças para farmácias parceiras (até 1/12)",
    "atas/2026-11-08-slogan-com-diretor.md": "# Slogan — conversa com o diretor (08/11)\n\n- Proposta do diretor: \"o protetor mais barato do\n  mercado\"\n- Recusada: fora do tom da marca e igual ao que\n  gerou a crise de março\n- Combinado: testar duas versões antes de fechar\n  - \"proteção de verdade, com preço justo\"\n  - \"proteção que acompanha o seu dia\"",
-   ".claude/commands/debrief.md": "---\ndescription: Revisa a conversa e propõe o que guardar\n---\n\nRevise esta conversa e identifique o que vale guardar\nno repositório: aprovações, aprendizados, prazos.\n\nPara cada item, diga o que é, em qual arquivo vai\nficar e mostre um rascunho. Espere minha aprovação\nantes de escrever qualquer arquivo.",
-   ".claude/commands/backup.md": "---\ndescription: Salva uma cópia de segurança no GitHub\n---\n\nConfira o que mudou desde a última cópia, salve as\nmudanças com uma descrição curta e envie para o\nGitHub. Se encontrar algo que pareça senha ou dado\nsensível, pare e me avise antes."
+   ".claude/commands/debrief.md": "---\ndescription: Revisa a conversa e propõe o que guardar\n---\n\nRevise esta conversa e identifique o que vale guardar\nno repositório: aprovações, aprendizados, prazos.\n\nPara cada item, diga o que é, em qual arquivo vai\nficar e mostre um rascunho. Espere minha aprovação\nantes de escrever qualquer arquivo."
   },
   "home": {
    "c1": "Você cuida da comunicação de uma marca de cosméticos e vai lançar um protetor solar. Abre o chat e conta tudo: o tom de voz da marca, o público, o prazo, o que deu errado na campanha de março.",
@@ -1407,9 +1400,7 @@ Antes de criar qualquer arquivo, me entreviste, uma pergunta por vez:
 Depois, crie:
 - Um CLAUDE.md enxuto: o que é o repositório, quem sou eu, minhas preferências, a estrutura de pastas e regras dizendo onde registrar cada tipo de informação.
 - Poucas pastas com propósito claro, sempre incluindo plano/ (próximos passos) e atas/ (registro de conversas).
-- Dois comandos em .claude/commands/:
-  - debrief.md: revisa a conversa, propõe o que guardar e onde, e espera minha aprovação antes de escrever.
-  - backup.md: salva uma cópia no GitHub. Se o git ou o GitHub ainda não estiverem configurados no meu computador, me guie passo a passo.
+- Um comando em .claude/commands/debrief.md: revisa a conversa, propõe o que guardar e onde, e espera minha aprovação antes de escrever.
 - Separe sempre fato confirmado de suposição.
 
 No fim, me mostre o que criou e pergunte se quero ajustar algo.`;
@@ -1442,7 +1433,7 @@ function buildSteps(T) {
   { ch: 1, title: "Criando a pasta, sem digitar nada",
     body: `<p>No Explorador, clique em <b>Abrir pasta</b> (ou use o menu File → Open Folder).</p>
 <p>Abre a mesma janela que você já usa para abrir qualquer arquivo do computador. Escolha onde guardar, por exemplo em <b>Documentos</b>, clique em <b>Nova pasta</b> e dê um nome a ela: <b>${T.folder}</b>.</p>
-<p>Prefira um nome curto, sem espaços nem acentos.</p>`,
+<p>Prefira um nome curto, sem espaços nem acentos. Se quiser uma cópia de segurança automática, crie a pasta dentro do <b>Google Drive</b>, do <b>OneDrive</b> ou do <b>iCloud Drive</b>.</p>`,
     apply: s => { s.dialog = true; s.focus = "openbtn"; } },
 
   { ch: 1, title: "A pasta aberta",
@@ -1472,9 +1463,9 @@ function buildSteps(T) {
   { ch: 1, title: "O Claude monta a estrutura",
     body: `<p>Com as suas respostas, o Claude cria os arquivos. Cada pasta guarda um tipo de informação:</p>
 <ul>${T.dirs.map(([d, x]) => `<li><b>${d}</b>: ${x}</li>`).join("")}</ul>
-<p>A pasta <b>.claude</b> guarda dois comandos, <code>/debrief</code> e <code>/backup</code>, que você vai usar mais adiante.</p>`,
+<p>A pasta <b>.claude</b> guarda o comando <code>/debrief</code>, que você vai usar mais adiante.</p>`,
     apply: s => {
-      const criados = T.base.filter(f => !f.startsWith(".claude/")).concat(".claude/commands/debrief.md e backup.md");
+      const criados = T.base.filter(f => !f.startsWith(".claude/")).concat(".claude/commands/debrief.md");
       s.term.push({ t: "claude", c: "Entendi. Vou criar a estrutura do repositório:" },
         ...criados.map(c => ({ t: "tool", ok: true, c: "✓ " + c })),
         { t: "claude", c: "Pronto. Dá uma olhada no `CLAUDE.md` e me diz se quer ajustar algo." });
@@ -1484,7 +1475,7 @@ function buildSteps(T) {
 
   { ch: 1, title: "O arquivo principal",
     body: `<p>O <b>CLAUDE.md</b> é lido inteiro toda vez que o Claude abre nesta pasta. Ele diz quem você é, quais são suas restrições, como você quer ser ajudado e onde fica cada coisa.</p>
-<p>É texto simples, num formato chamado <b>markdown</b>: o <code>#</code> vira título e o <code>-</code> vira item de lista. Como não tem formatação escondida, você e a IA leem e editam o mesmo arquivo, e dá para guardar o histórico de cada mudança.</p>
+<p>É texto simples, num formato chamado <b>markdown</b>: o <code>#</code> vira título e o <code>-</code> vira item de lista. Como não tem formatação escondida, você e a IA leem e editam o mesmo arquivo, sem depender de nenhum programa específico.</p>
 <p>Você pode editar esse arquivo à mão quando quiser.</p>`,
     apply: s => { s.open = "CLAUDE.md"; s.focus = "editor"; } },
 
@@ -1529,7 +1520,7 @@ function buildSteps(T) {
       s.term.push({ t: "user", c: "pode salvar" },
         { t: "tool", ok: true, c: `✓ ${T.newFile} (novo)` },
         { t: "tool", ok: true, c: `✓ ${T.editFile} (editado)` },
-        { t: "claude", c: "Salvo. Quando quiser, rode `/backup` para guardar uma cópia." });
+        { t: "claude", c: "Salvo. Na próxima conversa, já parto daqui." });
       s.files.push(T.newFile);
       s.contents[T.editFile] = T.F[T.editFile + "@2"];
       s.changed = { [T.newFile]: "U", [T.editFile]: "M" };
@@ -1539,23 +1530,11 @@ function buildSteps(T) {
       s.focus = "editor";
     } },
 
-  { ch: 3, title: "/backup: salvar uma cópia",
-    body: `<p>Até aqui, tudo existe só no seu computador. O <code>/backup</code> envia uma cópia de segurança para o <b>GitHub</b>, um serviço que guarda arquivos e o histórico de cada mudança. Pense nele como um Google Drive para este tipo de pasta.</p>
-<p>As letras U e M sumiram da lista de arquivos: está tudo salvo.</p>`,
-    apply: s => {
-      s.term.push({ t: "user", c: "/backup" },
-        { t: "tool", c: "Conferindo o que mudou: 1 arquivo novo, 1 editado" },
-        { t: "tool", ok: true, c: "✓ Cópia de segurança enviada para o GitHub" },
-        { t: "claude", c: "Pronto, está tudo salvo." });
-      s.changed = {}; s.focus = "term";
-    } },
-
   { ch: 4, title: "O ciclo completo",
-    body: `<p>Daqui pra frente, é só repetir quatro passos:</p>
+    body: `<p>Daqui pra frente, é só repetir três passos:</p>
 <ol><li><b>Abrir</b> a pasta no VS Code e digitar <code>claude</code>.</li>
 <li><b>Conversar</b> sobre o assunto.</li>
-<li><code>/debrief</code> para guardar o que importa.</li>
-<li><code>/backup</code> para salvar uma cópia.</li></ol>
+<li><code>/debrief</code> para guardar o que importa.</li></ol>
 <p>Cada volta deixa o Claude mais informado sobre o seu assunto. Serve para uma reforma, um negócio, o trabalho ou um hobby: um repositório por assunto.</p>`,
     apply: s => { s.mode = "desktop"; s.desk = "cycle"; } },
 
@@ -1645,8 +1624,8 @@ function desktopHTML(s) {
     <h3>Uma semana depois</h3>
     <p>${T.laterDesk}</p></div>`;
   return `<div class="desktop">
-    <h3>Abrir → conversar → /debrief → /backup</h3>
-    <p>Quatro passos, sempre os mesmos. A cada volta, seus arquivos ficam mais completos e o Claude começa a conversa sabendo mais.</p></div>`;
+    <h3>Abrir → conversar → /debrief</h3>
+    <p>Três passos, sempre os mesmos. A cada volta, seus arquivos ficam mais completos e o Claude começa a conversa sabendo mais.</p></div>`;
 }
 
 function treeHTML(s) {
@@ -1732,9 +1711,9 @@ function guideHTML() {
     <li><div><h5>Crie a pasta do seu assunto</h5><p>No VS Code, clique em <b>Abrir pasta</b> no Explorador (ou menu File → Open Folder). Na janela que abrir, escolha <b>Documentos</b>, clique em <b>Nova pasta</b>, dê um nome curto ao seu assunto, sem espaços nem acentos, e clique em <b>Abrir</b>.</p></div></li>
     <li><div><h5>Chame o Claude</h5><p>Abra o terminal (menu Terminal → New Terminal), digite o comando abaixo e aperte Enter. É o único comando que você precisa saber.</p>
       <div class="copy">claude<button data-copy="claude">Copiar</button></div></div></li>
-    <li><div><h5>Cole o roteiro e responda à entrevista</h5><p>O Claude cria o CLAUDE.md, as pastas e os comandos <code>/debrief</code> e <code>/backup</code>.</p>
+    <li><div><h5>Cole o roteiro e responda à entrevista</h5><p>O Claude cria o CLAUDE.md, as pastas e o comando <code>/debrief</code>.</p>
       <div class="copy long" id="roteiro">${esc(ROTEIRO)}<button data-copy-id="roteiro">Copiar</button></div></div></li>
-    <li><div><h5>Use o ciclo</h5><p>Abrir, conversar, <code>/debrief</code>, <code>/backup</code>. O <code>/backup</code> precisa de uma conta gratuita no <a href="https://github.com/signup" target="_blank" rel="noopener">GitHub</a>. Se não quiser criar agora, use só o <code>/debrief</code>: seus arquivos ficam no seu computador.</p></div></li>
+    <li><div><h5>Use o ciclo</h5><p>Abrir, conversar, <code>/debrief</code>. Se a pasta estiver no Google Drive, no OneDrive ou no iCloud Drive, a cópia de segurança acontece sozinha. Quem quiser ir além pode guardar o histórico de cada mudança no <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>, mas não é preciso para começar.</p></div></li>
   </ol>
   <div class="contact"><b>Quer ajuda para montar o seu?</b><p>Ofereço uma consultoria individual para montar o seu repositório junto com você. Fale comigo no <a href="https://www.linkedin.com/in/matcastella/" target="_blank" rel="noopener">LinkedIn</a>.</p></div>
 </div>`;
