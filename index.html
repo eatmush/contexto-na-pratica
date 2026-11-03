@@ -576,6 +576,18 @@ transform: none; }
 
 
 .landing { font-size: 17px; line-height: 1.55; letter-spacing: -.01em; background: var(--bg); color: var(--ink); font-family: var(--font-body); min-height: 100%; }
+.landing .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.landing .pick-wrap { display: inline-block; }
+.landing #tema {
+  appearance: none; -webkit-appearance: none; font: inherit; color: var(--ink); cursor: pointer;
+  background: var(--lime) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' fill='none' stroke='%232e3734' stroke-width='2'/></svg>") no-repeat right 9px center;
+  border: 0; border-radius: 8px; padding: 1px 30px 1px 8px; margin: 2px 0; transition: box-shadow .2s;
+}
+.landing #tema:hover { box-shadow: 0 0 0 3px rgba(46,55,52,.15); }
+.landing .story.swap .scene, .landing .story.swap .chapter p { animation: swapin .35s ease-out; }
+@keyframes swapin { from { opacity: .2; transform: translateY(4px); } to { opacity: 1; } }
+.tema-top { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+.tema-top select { font: inherit; color: var(--ink); background: #fff; border: 1px solid #cfd4d0; border-radius: 999px; padding: 3px 10px; cursor: pointer; }
 body.is-landing { height: auto; min-height: 100%; background: #f1f2f0; }
 body.is-landing .top, body.is-landing .main { display: none; }
 body:not(.is-landing) .landing { display: none; }
@@ -614,27 +626,32 @@ body:not(.is-landing) .landing { display: none; }
   <section class="hero">
     <div class="kicker">uma história curta sobre IA e memória</div>
     <h1>Você já contou a mesma história para a IA. <span class="hl">Mais de uma vez.</span></h1>
-    <p>Este site mostra, em 19 passos, como fazer o Claude lembrar do seu assunto de uma conversa para outra. Sem programar, e com um exemplo de verdade: a reforma de um apartamento.</p>
+    <p>Este site mostra, em 19 passos, como fazer o Claude lembrar do seu assunto de uma conversa para outra. Sem programar, e com um exemplo de verdade:
+      <label class="pick-wrap"><span class="sr">Escolha o exemplo</span><select id="tema" class="tema">
+        <option value="reforma">a reforma de um apartamento</option>
+        <option value="confeitaria">uma confeitaria por encomenda</option>
+        <option value="campanha">uma campanha no trabalho</option>
+      </select></label>.</p>
     <div class="cta-row">
       <a class="btn" href="/passo-1" data-step="0">Começar o passo a passo</a>
       <span>Não precisa instalar nada para assistir.</span>
     </div>
   </section>
 
-  <div class="story">
+  <div class="story" id="story">
     <section class="chapter">
       <div>
         <span class="day">dia 1</span>
         <h2>O dia em que você contou tudo</h2>
-        <p>Você decide reformar a cozinha. Abre o chat e conta tudo: o orçamento de R$ 45 mil, o prazo até março, o pedreiro que cobrou R$ 13.500, o piso que já escolheu.</p>
-        <p class="aside">Foram 42 mensagens. A IA ajudou bastante.</p>
+        <p data-t="c1"></p>
+        <p class="aside" data-t="c1aside"></p>
       </div>
       <div class="scene tilt-l" aria-label="Trechos da primeira conversa">
-        <span class="label">chat · conversa sobre a reforma</span>
-        <div class="q">Tenho R$ 45 mil no total e preciso terminar até março.</div>
-        <div class="q">O pedreiro João cobrou R$ 13.500.</div>
-        <div class="q">Já escolhi o piso: porcelanato 60x60 cinza claro.</div>
-        <div class="more">+ 39 mensagens</div>
+        <span class="label" data-t="c1label"></span>
+        <div class="q" data-t="b1"></div>
+        <div class="q" data-t="b2"></div>
+        <div class="q" data-t="b3"></div>
+        <div class="more" data-t="more"></div>
       </div>
     </section>
 
@@ -642,13 +659,13 @@ body:not(.is-landing) .landing { display: none; }
       <div>
         <span class="day">dia 8</span>
         <h2>A amnésia</h2>
-        <p>Uma semana depois, chega o orçamento do marceneiro. Você abre uma conversa nova e pergunta se cabe no orçamento.</p>
+        <p data-t="c2"></p>
         <p class="aside">E lá vai você: garimpar a conversa antiga ou explicar tudo de novo.</p>
       </div>
       <div class="scene tilt-r" aria-label="Conversa nova sem contexto">
         <span class="label">chat · conversa nova</span>
-        <div class="q">O marceneiro mandou R$ 15.800 pelos armários. Cabe no meu orçamento?</div>
-        <div class="a flat">Para avaliar, preciso de mais informações. Qual é o seu orçamento total? Quanto você planejou gastar com marcenaria?</div>
+        <div class="q" data-t="ask"></div>
+        <div class="a flat" data-t="forgot"></div>
       </div>
     </section>
 
@@ -659,15 +676,9 @@ body:not(.is-landing) .landing { display: none; }
         <p>Em vez de deixar tudo espalhado em conversas, você guarda o que importa numa pasta do seu computador. Ela vira o caderno da IA: o Claude lê antes de responder e ajuda você a mantê-lo em dia.</p>
         <p class="aside">Isso tem nome: repositório de contexto. Mas pode chamar de caderno.</p>
       </div>
-      <div class="scene" aria-label="A pasta da reforma, com o que cada arquivo guarda">
+      <div class="scene" aria-label="A pasta do assunto, com o que cada arquivo guarda">
         <span class="label">no seu computador</span>
-        <div class="tree">
-          <span class="troot">reforma-apartamento/</span>
-          <div class="row main"><span>CLAUDE.md</span><span>quem você é e onde está cada coisa</span></div>
-          <div class="row"><span>decisoes/</span><span>o que já foi decidido, e por quê</span></div>
-          <div class="row"><span>orcamentos/</span><span>cada proposta que chegou</span></div>
-          <div class="row"><span>plano/</span><span>o que falta fazer, e até quando</span></div>
-        </div>
+        <div class="tree" id="tree"></div>
       </div>
     </section>
 
@@ -678,10 +689,10 @@ body:not(.is-landing) .landing { display: none; }
         <p>Desta vez o Claude abriu o caderno antes de responder. Você não explicou nada.</p>
       </div>
       <div class="scene dark tilt-l" aria-label="Mesma pergunta respondida com o contexto">
-        <span class="label">claude · na pasta da reforma</span>
-        <div class="q">O marceneiro mandou R$ 15.800 pelos armários. Cabe no meu orçamento?</div>
-        <div class="src">⎿ Lendo decisoes/escolhas.md</div>
-        <div class="a">Não cabe no que você planejou. O teto de marcenaria é <b>R$ 12.000</b>, então passa R$ 3.800, e a sua reserva para imprevistos cairia para R$ 200.</div>
+        <span class="label" data-t="c4label"></span>
+        <div class="q" data-t="ask"></div>
+        <div class="src" data-t="src"></div>
+        <div class="a" data-t="answer"></div>
       </div>
     </section>
 
@@ -797,12 +808,17 @@ body:not(.is-landing) .landing { display: none; }
     <p>O passo a passo mostra tudo numa simulação da tela do computador, do primeiro arquivo ao primeiro backup.</p>
     <a class="btn" href="/passo-1" data-step="0">Começar o passo a passo</a>
   </section>
-  <p class="foot">exemplo usado no passo a passo: a reforma de um apartamento · quer ajuda para montar o seu? <a href="https://www.linkedin.com/in/matcastella/" target="_blank" rel="noopener">fale comigo no linkedin</a></p>
+  <p class="foot">exemplo usado no passo a passo: <span data-t="label">a reforma de um apartamento</span> · quer ajuda para montar o seu? <a href="https://www.linkedin.com/in/matcastella/" target="_blank" rel="noopener">fale comigo no linkedin</a></p>
 </div>
 </div>
 
 <header class="top">
   <a class="brand" href="/" data-home>Repositório de contexto <span>na prática</span></a>
+  <label class="tema-top"><span>exemplo:</span><select id="temaTop" class="tema" aria-label="Exemplo usado no passo a passo">
+        <option value="reforma">a reforma de um apartamento</option>
+        <option value="confeitaria">uma confeitaria por encomenda</option>
+        <option value="campanha">uma campanha no trabalho</option>
+      </select></label>
   <nav class="chapters" id="chapters" aria-label="Partes"></nav>
 </header>
 
@@ -823,118 +839,442 @@ body:not(.is-landing) .landing { display: none; }
 
 <script>
 /* ---------- Conteúdo dos arquivos do repositório de exemplo ---------- */
-const F = {};
-F["CLAUDE.md"] = `# CLAUDE.md
-
-Este arquivo orienta o Claude Code neste repositório.
-
-## O que é este repositório
-
-Contexto da reforma do meu apartamento: cozinha e
-banheiro social. Estágio atual: recebendo orçamentos,
-ainda não fechei com ninguém.
-
-## Sobre mim
-
-- **Papel:** dono do apartamento, coordeno a obra
-  sem arquiteto
-- **Restrições:** R$ 45.000 no total; a obra precisa
-  terminar até março
-- **Conhecimento de obra:** nenhum. Risco: aceitar
-  um orçamento ruim por não saber comparar
-
-**Preferências de comunicação:**
-- Direto, sem rodeio
-- Me avise quando um gasto ameaçar o orçamento total
-
-## Estrutura do repositório
-
-orcamentos/  → propostas recebidas, uma por fornecedor
-decisoes/    → o que já foi decidido e por quê
-plano/       → próximos passos e prazos
-atas/        → conversas com fornecedores e visitas
-
-## Comandos disponíveis
-
-- \`/debrief\` — revisa a conversa e propõe o que guardar.
-  Pede aprovação antes de escrever.
-- \`/backup\` — salva uma cópia de segurança no GitHub.
-
-## Como me ajudar
-
-- Orçamento novo → registrar em \`orcamentos/\` e comparar
-  com o teto do item em \`decisoes/escolhas.md\`
-- Toda decisão → \`decisoes/escolhas.md\`, com o motivo
-- Prazos e pendências → \`plano/proximos-passos.md\``;
-
-F["decisoes/escolhas.md"] = `# Escolhas da reforma
-
-## Já decidido
-
-- Piso da cozinha: porcelanato 60x60 cinza claro.
-  Motivo: mais fácil de limpar e 30% mais barato
-  que o 90x90
-- Banheiro: trocar a banheira por box, para ganhar
-  espaço
-
-## Teto por item (soma: R$ 45.000)
-
-- Marcenaria (armários da cozinha): R$ 12.000
-- Revestimentos e piso: R$ 9.000
-- Mão de obra do pedreiro: R$ 14.000
-- Elétrica e hidráulica: R$ 6.000
-- Reserva para imprevistos: R$ 4.000`;
-
-F["orcamentos/pedreiro-joao.md"] = `# Pedreiro — João
-
-- Valor: R$ 13.500 (teto: R$ 14.000)
-- Começa em 05/12, duração de 10 semanas
-- Status: bom candidato, falta pedir referências`;
-
-F["plano/proximos-passos.md"] = `# Próximos passos
-
-- [ ] Pedir 3 orçamentos de marcenaria (até 15/11)
-- [ ] Visita do eletricista (20/11)
-- [ ] Fechar o pedreiro antes de dezembro (agenda lota)`;
-
-F["plano/proximos-passos.md@2"] = `# Próximos passos
-
-- [ ] Pedir 3 orçamentos de marcenaria (até 15/11)
-      Recebido: Paulo. Faltam 2.
-- [ ] Decidir a marcenaria só depois dos 3 orçamentos
-- [ ] Visita do eletricista (20/11)
-- [ ] Fechar o pedreiro antes de dezembro (agenda lota)`;
-
-F["orcamentos/marcenaria-paulo.md"] = `# Marcenaria — Paulo
-
-Recebido em 08/11.
-
-- Armários da cozinha em MDF laca: R$ 15.800
-- Mesmo projeto em MDF texturizado: R$ 12.900
-- Teto planejado para marcenaria: R$ 12.000
-
-Status: aguardando os outros 2 orçamentos antes
-de decidir.`;
-
-F[".claude/commands/debrief.md"] = `---
-description: Revisa a conversa e propõe o que guardar
----
-
-Revise esta conversa e identifique o que vale guardar
-no repositório: orçamentos novos, decisões, prazos.
-
-Para cada item, diga o que é, em qual arquivo vai
-ficar e mostre um rascunho. Espere minha aprovação
-antes de escrever qualquer arquivo.`;
-
-F[".claude/commands/backup.md"] = `---
-description: Salva uma cópia de segurança no GitHub
----
-
-Confira o que mudou desde a última cópia, salve as
-mudanças com uma descrição curta e envie para o
-GitHub. Se encontrar algo que pareça senha ou dado
-sensível, pare e me avise antes.`;
+/* ---------- Exemplos (temas) ---------- */
+const THEMES = {
+ "reforma": {
+  "label": "a reforma de um apartamento",
+  "folder": "reforma-apartamento",
+  "short": "a pasta da reforma",
+  "s1": "<p>Três dias atrás você passou uma hora explicando a reforma do seu apartamento para a IA: orçamento, prazos, o que já tinha decidido.</p>\n<p>Hoje chegou o orçamento do marceneiro, você abriu uma conversa nova e a IA não lembra de nada. Ou você explica tudo de novo, ou garimpa a conversa antiga no meio de dezenas de outras.</p>",
+  "chat": {
+   "old": "Você explicou a reforma inteira: orçamento total, teto por item, prazos, o orçamento do pedreiro e o que já tinha decidido. <b>42 mensagens.</b>",
+   "me": "O marceneiro Paulo mandou R$ 15.800 pelos armários da cozinha. Cabe no meu orçamento?",
+   "ai": "Para avaliar, preciso de mais informações. Qual é o seu orçamento total para a reforma? Quanto você planejou gastar com marcenaria? Já recebeu outros orçamentos para comparar?"
+  },
+  "interview": [
+   {
+    "t": "user",
+    "c": "A reforma do meu apartamento: cozinha e banheiro social."
+   },
+   {
+    "t": "claude",
+    "c": "Em que pé está a reforma, e quais são as suas restrições?"
+   },
+   {
+    "t": "user",
+    "c": "Estou recebendo orçamentos. Tenho R$ 45 mil no total e preciso terminar até março. Já tenho o do pedreiro João: R$ 13.500."
+   },
+   {
+    "t": "claude",
+    "c": "Você já fez uma obra antes?"
+   },
+   {
+    "t": "user",
+    "c": "Nunca. Meu medo é aceitar um orçamento ruim por não saber comparar."
+   }
+  ],
+  "interviewMore": "(mais 4 perguntas sobre decisões já tomadas e como você quer ser ajudado)",
+  "interviewNote": "Repare na última resposta: dizer que nunca fez uma obra muda o jeito como ele vai te ajudar.",
+  "dirs": [
+   [
+    "orcamentos/",
+    "uma proposta por fornecedor"
+   ],
+   [
+    "decisoes/",
+    "o que já foi decidido e por quê"
+   ],
+   [
+    "plano/",
+    "próximos passos e prazos"
+   ],
+   [
+    "atas/",
+    "conversas e visitas"
+   ]
+  ],
+  "base": [
+   "CLAUDE.md",
+   "decisoes/escolhas.md",
+   "orcamentos/pedreiro-joao.md",
+   "plano/proximos-passos.md",
+   "atas/",
+   ".claude/commands/debrief.md",
+   ".claude/commands/backup.md"
+  ],
+  "factsFile": "decisoes/escolhas.md",
+  "factsRef": [
+   13
+  ],
+  "factsBody": "<p>O CLAUDE.md diz onde as coisas estão. Os fatos ficam nos outros arquivos.</p>\n<p>Aqui, em <b>decisoes/escolhas.md</b>, está o que você já decidiu e quanto pode gastar com cada parte da obra.</p>\n<p>Guarde o teto de <b>R$ 12.000 para marcenaria</b>. Ele vai aparecer de novo.</p>",
+  "laterLine": "Aí chegou o orçamento do marceneiro.",
+  "laterDesk": "Chegou o orçamento do marceneiro.",
+  "ask": "O marceneiro Paulo mandou R$ 15.800 pelos armários da cozinha. Cabe no meu orçamento?",
+  "reads": [
+   "decisoes/escolhas.md",
+   "plano/proximos-passos.md"
+  ],
+  "answer": "Não cabe no que você planejou. O teto de marcenaria é **R$ 12.000** (`decisoes/escolhas.md`), então esse orçamento passa R$ 3.800.\n\nSe fechar assim, a reserva para imprevistos cai de R$ 4.000 para R$ 200, antes de a obra começar.\n\nAntes de decidir:\n1. Ainda faltam 2 dos 3 orçamentos de marcenaria (prazo 15/11, em `plano/proximos-passos.md`).\n2. Pergunte ao Paulo se trocar o MDF laca por MDF texturizado baixa o valor.",
+  "answerFile": "decisoes/escolhas.md",
+  "answerRef": [
+   13,
+   17
+  ],
+  "answerNote": "Você fez exatamente a pergunta do chat. Desta vez o Claude consultou seus arquivos e respondeu com os seus números: o teto da marcenaria, a reserva para imprevistos e o prazo dos outros orçamentos.",
+  "continueNote": "Você negociou com o marceneiro e decidiu esperar os outros orçamentos.",
+  "cont": [
+   {
+    "t": "user",
+    "c": "Ele topou fazer em MDF texturizado por R$ 12.900. Vou esperar os outros dois orçamentos antes de decidir."
+   },
+   {
+    "t": "claude",
+    "c": "Boa. Com R$ 12.900 você fica R$ 900 acima do teto, e a reserva cairia para R$ 3.100. Os outros dois orçamentos vencem em 15/11."
+   }
+  ],
+  "debrief": "Revisei a conversa. Proponho guardar:\n\n1. `orcamentos/marcenaria-paulo.md` (novo)\n   Proposta do Paulo: R$ 15.800 em laca, R$ 12.900 em MDF texturizado.\n\n2. `plano/proximos-passos.md` (editar)\n   Decidir a marcenaria só depois dos 3 orçamentos.\n\nNão vou mexer em `decisoes/escolhas.md`: nada foi decidido ainda.\n\nPosso salvar?",
+  "debriefNote": "E também diz o que não vai mexer: como nada foi decidido ainda, o arquivo de decisões fica como está.",
+  "newFile": "orcamentos/marcenaria-paulo.md",
+  "editFile": "plano/proximos-passos.md",
+  "editHl": [
+   4,
+   5
+  ],
+  "updateNote": "Na próxima conversa, o Claude já vai saber que você está esperando os outros orçamentos.",
+  "F": {
+   "CLAUDE.md": "# CLAUDE.md\n\nEste arquivo orienta o Claude Code neste repositório.\n\n## O que é este repositório\n\nContexto da reforma do meu apartamento: cozinha e\nbanheiro social. Estágio atual: recebendo orçamentos,\nainda não fechei com ninguém.\n\n## Sobre mim\n\n- **Papel:** dono do apartamento, coordeno a obra\n  sem arquiteto\n- **Restrições:** R$ 45.000 no total; a obra precisa\n  terminar até março\n- **Conhecimento de obra:** nenhum. Risco: aceitar\n  um orçamento ruim por não saber comparar\n\n**Preferências de comunicação:**\n- Direto, sem rodeio\n- Me avise quando um gasto ameaçar o orçamento total\n\n## Estrutura do repositório\n\norcamentos/  → propostas recebidas, uma por fornecedor\ndecisoes/    → o que já foi decidido e por quê\nplano/       → próximos passos e prazos\natas/        → conversas com fornecedores e visitas\n\n## Comandos disponíveis\n\n- `/debrief` — revisa a conversa e propõe o que guardar.\n  Pede aprovação antes de escrever.\n- `/backup` — salva uma cópia de segurança no GitHub.\n\n## Como me ajudar\n\n- Orçamento novo → registrar em `orcamentos/` e comparar\n  com o teto do item em `decisoes/escolhas.md`\n- Toda decisão → `decisoes/escolhas.md`, com o motivo\n- Prazos e pendências → `plano/proximos-passos.md`",
+   "decisoes/escolhas.md": "# Escolhas da reforma\n\n## Já decidido\n\n- Piso da cozinha: porcelanato 60x60 cinza claro.\n  Motivo: mais fácil de limpar e 30% mais barato\n  que o 90x90\n- Banheiro: trocar a banheira por box, para ganhar\n  espaço\n\n## Teto por item (soma: R$ 45.000)\n\n- Marcenaria (armários da cozinha): R$ 12.000\n- Revestimentos e piso: R$ 9.000\n- Mão de obra do pedreiro: R$ 14.000\n- Elétrica e hidráulica: R$ 6.000\n- Reserva para imprevistos: R$ 4.000",
+   "orcamentos/pedreiro-joao.md": "# Pedreiro — João\n\n- Valor: R$ 13.500 (teto: R$ 14.000)\n- Começa em 05/12, duração de 10 semanas\n- Status: bom candidato, falta pedir referências",
+   "plano/proximos-passos.md": "# Próximos passos\n\n- [ ] Pedir 3 orçamentos de marcenaria (até 15/11)\n- [ ] Visita do eletricista (20/11)\n- [ ] Fechar o pedreiro antes de dezembro (agenda lota)",
+   "plano/proximos-passos.md@2": "# Próximos passos\n\n- [ ] Pedir 3 orçamentos de marcenaria (até 15/11)\n      Recebido: Paulo. Faltam 2.\n- [ ] Decidir a marcenaria só depois dos 3 orçamentos\n- [ ] Visita do eletricista (20/11)\n- [ ] Fechar o pedreiro antes de dezembro (agenda lota)",
+   "orcamentos/marcenaria-paulo.md": "# Marcenaria — Paulo\n\nRecebido em 08/11.\n\n- Armários da cozinha em MDF laca: R$ 15.800\n- Mesmo projeto em MDF texturizado: R$ 12.900\n- Teto planejado para marcenaria: R$ 12.000\n\nStatus: aguardando os outros 2 orçamentos antes\nde decidir.",
+   ".claude/commands/debrief.md": "---\ndescription: Revisa a conversa e propõe o que guardar\n---\n\nRevise esta conversa e identifique o que vale guardar\nno repositório: orçamentos novos, decisões, prazos.\n\nPara cada item, diga o que é, em qual arquivo vai\nficar e mostre um rascunho. Espere minha aprovação\nantes de escrever qualquer arquivo.",
+   ".claude/commands/backup.md": "---\ndescription: Salva uma cópia de segurança no GitHub\n---\n\nConfira o que mudou desde a última cópia, salve as\nmudanças com uma descrição curta e envie para o\nGitHub. Se encontrar algo que pareça senha ou dado\nsensível, pare e me avise antes."
+  },
+  "home": {
+   "c1": "Você decide reformar a cozinha. Abre o chat e conta tudo: o orçamento de R$ 45 mil, o prazo até março, o pedreiro que cobrou R$ 13.500, o piso que já escolheu.",
+   "c1aside": "Foram 42 mensagens. A IA ajudou bastante.",
+   "c1label": "chat · conversa sobre a reforma",
+   "b1": "Tenho R$ 45 mil no total e preciso terminar até março.",
+   "b2": "O pedreiro João cobrou R$ 13.500.",
+   "b3": "Já escolhi o piso: porcelanato 60x60 cinza claro.",
+   "more": "+ 39 mensagens",
+   "c2": "Uma semana depois, chega o orçamento do marceneiro. Você abre uma conversa nova e pergunta se cabe no orçamento.",
+   "ask": "O marceneiro mandou R$ 15.800 pelos armários. Cabe no meu orçamento?",
+   "forgot": "Para avaliar, preciso de mais informações. Qual é o seu orçamento total? Quanto você planejou gastar com marcenaria?",
+   "tree": [
+    [
+     "decisoes/",
+     "o que já foi decidido, e por quê"
+    ],
+    [
+     "orcamentos/",
+     "cada proposta que chegou"
+    ],
+    [
+     "plano/",
+     "o que falta fazer, e até quando"
+    ]
+   ],
+   "c4label": "claude · na pasta da reforma",
+   "src": "⎿ Lendo decisoes/escolhas.md",
+   "answer": "Não cabe no que você planejou. O teto de marcenaria é <b>R$ 12.000</b>, então passa R$ 3.800, e a sua reserva para imprevistos cairia para R$ 200."
+  }
+ },
+ "confeitaria": {
+  "label": "uma confeitaria por encomenda",
+  "folder": "confeitaria",
+  "short": "a pasta da confeitaria",
+  "s1": "<p>Três dias atrás você passou uma hora explicando a sua confeitaria para a IA: custo de cada receita, preços, regras de pedido, quem são as clientes.</p>\n<p>Hoje chegou um pedido grande, com pedido de desconto, você abriu uma conversa nova e a IA não lembra de nada. Ou você explica tudo de novo, ou garimpa a conversa antiga no meio de dezenas de outras.</p>",
+  "chat": {
+   "old": "Você explicou a confeitaria inteira: custo e preço de cada receita, margem mínima, pedido mínimo e quem são as clientes. <b>37 mensagens.</b>",
+   "me": "Uma cliente quer 200 brigadeiros para um casamento, com 20% de desconto. Aceito?",
+   "ai": "Depende. Quanto custa produzir cada brigadeiro? Qual preço você costuma cobrar? Você tem uma margem mínima para pedidos grandes?"
+  },
+  "interview": [
+   {
+    "t": "user",
+    "c": "Minha confeitaria: vendo doces por encomenda, feitos em casa."
+   },
+   {
+    "t": "claude",
+    "c": "Como funciona hoje, e quais são as suas regras?"
+   },
+   {
+    "t": "user",
+    "c": "Vendo brigadeiro gourmet a R$ 3,50 e cada um me custa R$ 1,80. Pedido mínimo de 50 unidades, com 5 dias de antecedência. Não aceito margem abaixo de 40%."
+   },
+   {
+    "t": "claude",
+    "c": "Você já calculou preço com algum método antes?"
+   },
+   {
+    "t": "user",
+    "c": "Não. Meu medo é dar desconto demais e trabalhar de graça sem perceber."
+   }
+  ],
+  "interviewMore": "(mais 4 perguntas sobre clientes, regras e como você quer ser ajudado)",
+  "interviewNote": "Repare na última resposta: contar que tem medo de dar desconto demais muda o jeito como ele vai te ajudar.",
+  "dirs": [
+   [
+    "precos/",
+    "custo e preço de cada receita"
+   ],
+   [
+    "clientes/",
+    "quem compra, o quê e quando"
+   ],
+   [
+    "decisoes/",
+    "as regras do negócio e por quê"
+   ],
+   [
+    "plano/",
+    "encomendas e próximos passos"
+   ],
+   [
+    "atas/",
+    "conversas com clientes e fornecedores"
+   ]
+  ],
+  "base": [
+   "CLAUDE.md",
+   "precos/receitas.md",
+   "decisoes/regras.md",
+   "clientes/clientes-frequentes.md",
+   "plano/proximos-passos.md",
+   "atas/",
+   ".claude/commands/debrief.md",
+   ".claude/commands/backup.md"
+  ],
+  "factsFile": "decisoes/regras.md",
+  "factsRef": [
+   5
+  ],
+  "factsBody": "<p>O CLAUDE.md diz onde as coisas estão. Os fatos ficam nos outros arquivos.</p>\n<p>Aqui, em <b>decisoes/regras.md</b>, estão as regras do seu negócio. O custo e o preço de cada receita ficam em <b>precos/receitas.md</b>.</p>\n<p>Guarde a <b>margem mínima de 40%</b>. Ela vai aparecer de novo.</p>",
+  "laterLine": "Aí chegou um pedido grande, com pedido de desconto.",
+  "laterDesk": "Chegou um pedido de 200 brigadeiros.",
+  "ask": "Uma cliente quer 200 brigadeiros para um casamento, com 20% de desconto. Aceito?",
+  "reads": [
+   "precos/receitas.md",
+   "decisoes/regras.md"
+  ],
+  "answer": "Do jeito que ela pediu, não. Com 20% de desconto, o brigadeiro sai a **R$ 2,80** e a margem cai para 36%, abaixo dos 40% da sua regra (`decisoes/regras.md`).\n\nNesse preço, os 200 brigadeiros dariam R$ 200 de lucro, contra R$ 340 sem desconto.\n\nAntes de responder:\n1. Até 14% de desconto você fica dentro da regra. Com 10%, sai a R$ 3,15 e a margem fica em 43%.\n2. Lembre do sinal de 50% para confirmar (também em `decisoes/regras.md`).",
+  "answerFile": "decisoes/regras.md",
+  "answerRef": [
+   5,
+   10
+  ],
+  "answerNote": "Você fez exatamente a pergunta do chat. Desta vez o Claude consultou seus arquivos e respondeu com os seus números: o custo do brigadeiro, a margem mínima e até quanto de desconto dá para dar.",
+  "continueNote": "Você fez a contraproposta de 10% e fechou o pedido.",
+  "cont": [
+   {
+    "t": "user",
+    "c": "Ofereci 10% e ela aceitou: 200 brigadeiros a R$ 3,15, entrega no dia 22/11."
+   },
+   {
+    "t": "claude",
+    "c": "Ótimo. Margem de 43%, dentro da regra. São R$ 630 no total, e o sinal de 50% fica em R$ 315."
+   }
+  ],
+  "debrief": "Revisei a conversa. Proponho guardar:\n\n1. `clientes/pedido-casamento-22-11.md` (novo)\n   200 brigadeiros a R$ 3,15 (10% de desconto), entrega em 22/11, sinal de R$ 315.\n\n2. `plano/proximos-passos.md` (editar)\n   Entrega do casamento em 22/11, cobrar o sinal antes de comprar os insumos.\n\nNão vou mexer em `decisoes/regras.md`: a regra de margem continua a mesma.\n\nPosso salvar?",
+  "debriefNote": "E também diz o que não vai mexer: a regra de margem continua valendo, então o arquivo de regras fica como está.",
+  "newFile": "clientes/pedido-casamento-22-11.md",
+  "editFile": "plano/proximos-passos.md",
+  "editHl": [
+   4,
+   5
+  ],
+  "updateNote": "Na próxima conversa, o Claude já vai saber do pedido do casamento e do sinal que falta cobrar.",
+  "F": {
+   "CLAUDE.md": "# CLAUDE.md\n\nEste arquivo orienta o Claude Code neste repositório.\n\n## O que é este repositório\n\nContexto da minha confeitaria por encomenda: doces\nfeitos em casa, vendidos para festas e eventos.\nEstágio atual: organizando preços e regras para\ncrescer sem perder dinheiro.\n\n## Sobre mim\n\n- **Papel:** produção, vendas e entregas, tudo por\n  minha conta\n- **Restrições:** cozinha de casa, até 600 doces por\n  semana\n- **Conhecimento de preço:** nunca calculei com\n  método. Risco: dar desconto demais sem perceber\n\n**Preferências de comunicação:**\n- Direto, sem rodeio\n- Me avise quando um pedido ficar abaixo da margem\n\n## Estrutura do repositório\n\nprecos/     → custo e preço de cada receita\nclientes/   → quem compra, o quê e quando\ndecisoes/   → regras do negócio, e por quê\nplano/      → encomendas e próximos passos\natas/       → conversas com clientes e fornecedores\n\n## Comandos disponíveis\n\n- `/debrief` — revisa a conversa e propõe o que guardar.\n  Pede aprovação antes de escrever.\n- `/backup` — salva uma cópia de segurança no GitHub.\n\n## Como me ajudar\n\n- Pedido ou desconto → conferir com `precos/receitas.md`\n  e com as regras em `decisoes/regras.md`\n- Toda regra nova → `decisoes/regras.md`, com o motivo\n- Encomendas e prazos → `plano/proximos-passos.md`",
+   "precos/receitas.md": "# Receitas: custo e preço\n\n## Brigadeiro gourmet\n- Custo por unidade: R$ 1,80\n- Preço de venda: R$ 3,50\n- Margem: 49%\n\n## Bem-casado\n- Custo por unidade: R$ 2,40\n- Preço de venda: R$ 5,00\n- Margem: 52%\n\n## Cupcake\n- Custo por unidade: R$ 4,10\n- Preço de venda: R$ 8,00\n- Margem: 49%",
+   "decisoes/regras.md": "# Regras do negócio\n\n## Já decidido\n\n- Margem mínima de 40% em qualquer pedido.\n  Motivo: abaixo disso, o pedido não paga as\n  horas de trabalho\n- Pedido mínimo: 50 unidades, com 5 dias de\n  antecedência\n- Sinal de 50% para confirmar o pedido\n- Entrega só na zona sul. Fora dela, retirada\n  no local",
+   "clientes/clientes-frequentes.md": "# Clientes frequentes\n\n- Ana Paula: festas infantis, pede todo mês\n- Buffet Estrela: casamentos, pedidos de 300+\n- Escritório Lima: coffee break às sextas",
+   "plano/proximos-passos.md": "# Próximos passos\n\n- [ ] Buffet Estrela: 300 bem-casados (até 20/11)\n- [ ] Testar receita de brigadeiro de pistache\n- [ ] Comprar embalagens para dezembro (até 25/11)",
+   "plano/proximos-passos.md@2": "# Próximos passos\n\n- [ ] Buffet Estrela: 300 bem-casados (até 20/11)\n- [ ] Casamento: 200 brigadeiros (entrega 22/11)\n      Cobrar o sinal de R$ 315 antes de comprar\n- [ ] Testar receita de brigadeiro de pistache\n- [ ] Comprar embalagens para dezembro (até 25/11)",
+   "clientes/pedido-casamento-22-11.md": "# Pedido — casamento (22/11)\n\n- 200 brigadeiros gourmet\n- Preço: R$ 3,15 por unidade (10% de desconto)\n- Total: R$ 630, sinal de R$ 315\n- Margem: 43%, dentro da regra de 40%\n\nStatus: aguardando o sinal.",
+   ".claude/commands/debrief.md": "---\ndescription: Revisa a conversa e propõe o que guardar\n---\n\nRevise esta conversa e identifique o que vale guardar\nno repositório: pedidos, preços, regras novas, prazos.\n\nPara cada item, diga o que é, em qual arquivo vai\nficar e mostre um rascunho. Espere minha aprovação\nantes de escrever qualquer arquivo.",
+   ".claude/commands/backup.md": "---\ndescription: Salva uma cópia de segurança no GitHub\n---\n\nConfira o que mudou desde a última cópia, salve as\nmudanças com uma descrição curta e envie para o\nGitHub. Se encontrar algo que pareça senha ou dado\nsensível, pare e me avise antes."
+  },
+  "home": {
+   "c1": "Você vende doces por encomenda e decide organizar o negócio. Abre o chat e conta tudo: o custo de cada receita, a margem mínima de 40%, o pedido mínimo, as clientes que mais compram.",
+   "c1aside": "Foram 37 mensagens. A IA ajudou bastante.",
+   "c1label": "chat · conversa sobre a confeitaria",
+   "b1": "Cada brigadeiro gourmet me custa R$ 1,80 e eu vendo a R$ 3,50.",
+   "b2": "Não aceito pedido com margem abaixo de 40%.",
+   "b3": "Pedido mínimo: 50 unidades, com 5 dias de antecedência.",
+   "more": "+ 34 mensagens",
+   "c2": "Uma semana depois, uma cliente pede 200 brigadeiros para um casamento, com 20% de desconto. Você abre uma conversa nova e pergunta se vale a pena.",
+   "ask": "Uma cliente quer 200 brigadeiros com 20% de desconto. Aceito?",
+   "forgot": "Depende. Quanto custa produzir cada brigadeiro? Qual preço você costuma cobrar? Você tem uma margem mínima?",
+   "tree": [
+    [
+     "precos/",
+     "custo e preço de cada receita"
+    ],
+    [
+     "clientes/",
+     "quem compra, o quê e quando"
+    ],
+    [
+     "decisoes/",
+     "as regras do negócio, e por quê"
+    ]
+   ],
+   "c4label": "claude · na pasta da confeitaria",
+   "src": "⎿ Lendo precos/receitas.md",
+   "answer": "Com 20% de desconto, o brigadeiro sai a <b>R$ 2,80</b> e a margem cai para 36%, abaixo dos 40% que você definiu. Até 14% de desconto você fica dentro da regra. Que tal oferecer 10%?"
+  }
+ },
+ "campanha": {
+  "label": "uma campanha no trabalho",
+  "folder": "campanha-protetor",
+  "short": "a pasta da campanha",
+  "s1": "<p>Três dias atrás você passou uma hora explicando a campanha do protetor solar para a IA: o tom de voz da marca, os prazos, o que deu errado na campanha de março.</p>\n<p>Hoje o diretor mandou uma ideia de slogan, você abriu uma conversa nova e a IA não lembra de nada. Ou você explica tudo de novo, ou garimpa a conversa antiga no meio de dezenas de outras.</p>",
+  "chat": {
+   "old": "Você explicou a campanha inteira: tom de voz da marca, público, prazos e a crise da campanha de março. <b>45 mensagens.</b>",
+   "me": "O diretor quer anunciar como “o protetor mais barato do mercado”. Pode?",
+   "ai": "Pode funcionar, depende da estratégia. Qual é o posicionamento da marca? Preço é um diferencial que vocês querem destacar? Vocês já fizeram comparações com concorrentes antes?"
+  },
+  "interview": [
+   {
+    "t": "user",
+    "c": "A campanha de lançamento do protetor solar da marca de cosméticos onde eu trabalho."
+   },
+   {
+    "t": "claude",
+    "c": "Qual é o seu papel, e quais são as restrições?"
+   },
+   {
+    "t": "user",
+    "c": "Eu cuido da comunicação. O lançamento é em 15/12, a verba é de R$ 80 mil e tudo passa pela aprovação do diretor de marketing."
+   },
+   {
+    "t": "claude",
+    "c": "Aconteceu algo em campanhas passadas que eu deva saber?"
+   },
+   {
+    "t": "user",
+    "c": "Sim. Em março, um anúncio comparando nosso preço com o do concorrente virou crise nas redes. Não quero repetir."
+   }
+  ],
+  "interviewMore": "(mais 4 perguntas sobre o tom da marca, o que já foi aprovado e como você quer ser ajudado)",
+  "interviewNote": "Repare na última resposta: contar o que deu errado antes muda o jeito como ele vai te ajudar.",
+  "dirs": [
+   [
+    "marca/",
+    "tom de voz e o que a marca não diz"
+   ],
+   [
+    "aprendizados/",
+    "o que funcionou e o que deu errado"
+   ],
+   [
+    "decisoes/",
+    "o que já foi aprovado e por quê"
+   ],
+   [
+    "plano/",
+    "entregas e prazos"
+   ],
+   [
+    "atas/",
+    "reuniões e alinhamentos"
+   ]
+  ],
+  "base": [
+   "CLAUDE.md",
+   "marca/tom-de-voz.md",
+   "aprendizados/campanhas-anteriores.md",
+   "decisoes/aprovacoes.md",
+   "plano/proximos-passos.md",
+   "atas/",
+   ".claude/commands/debrief.md",
+   ".claude/commands/backup.md"
+  ],
+  "factsFile": "marca/tom-de-voz.md",
+  "factsRef": [
+   10,
+   11
+  ],
+  "factsBody": "<p>O CLAUDE.md diz onde as coisas estão. Os fatos ficam nos outros arquivos.</p>\n<p>Aqui, em <b>marca/tom-de-voz.md</b>, está como a marca fala e o que ela não diz. O que deu certo e errado em campanhas passadas fica em <b>aprendizados/</b>.</p>\n<p>Guarde as duas últimas linhas: <b>nada de comparar com concorrente nem de usar preço como argumento principal</b>. Elas vão aparecer de novo.</p>",
+  "laterLine": "Aí o diretor mandou uma ideia de slogan.",
+  "laterDesk": "O diretor mandou uma ideia de slogan.",
+  "ask": "O diretor quer anunciar como “o protetor mais barato do mercado”. Pode?",
+  "reads": [
+   "marca/tom-de-voz.md",
+   "aprendizados/campanhas-anteriores.md"
+  ],
+  "answer": "Eu não usaria. Dois motivos que você pode levar ao diretor:\n\n1. Vai contra o tom da marca: comparar com concorrente e usar preço como argumento principal estão na lista do que a marca não diz (`marca/tom-de-voz.md`).\n2. Foi exatamente o que gerou a crise do hidratante em março (`aprendizados/campanhas-anteriores.md`).\n\nUma alternativa no tom da marca, que ainda fala de preço: **“proteção de verdade, com preço justo”**.",
+  "answerFile": "marca/tom-de-voz.md",
+  "answerRef": [
+   10,
+   11
+  ],
+  "answerNote": "Você fez exatamente a pergunta do chat. Desta vez o Claude consultou seus arquivos e respondeu com o que você já tinha registrado: o tom da marca e o que deu errado em março. E ainda deu argumentos para você levar ao diretor.",
+  "continueNote": "O diretor aceitou a alternativa, mas pediu um teste antes de fechar o slogan.",
+  "cont": [
+   {
+    "t": "user",
+    "c": "Levei os dois argumentos e o diretor topou a alternativa. Mas quer testar duas versões antes de fechar."
+   },
+   {
+    "t": "claude",
+    "c": "Boa. Sugiro testar “proteção de verdade, com preço justo” contra o conceito já aprovado, “proteção que acompanha o seu dia”. O prazo do slogan é 12/11, então o teste precisa rodar nesta semana."
+   }
+  ],
+  "debrief": "Revisei a conversa. Proponho guardar:\n\n1. `atas/2026-11-08-slogan-com-diretor.md` (novo)\n   O diretor desistiu de “o mais barato” e aceitou testar duas versões de slogan.\n\n2. `plano/proximos-passos.md` (editar)\n   Rodar o teste das duas versões nesta semana, antes do prazo de 12/11.\n\nNão vou mexer em `decisoes/aprovacoes.md`: o slogan ainda não foi aprovado.\n\nPosso salvar?",
+  "debriefNote": "E também diz o que não vai mexer: como o slogan ainda não foi aprovado, o arquivo de aprovações fica como está.",
+  "newFile": "atas/2026-11-08-slogan-com-diretor.md",
+  "editFile": "plano/proximos-passos.md",
+  "editHl": [
+   4
+  ],
+  "updateNote": "Na próxima conversa, o Claude já vai saber do teste das duas versões e do prazo.",
+  "F": {
+   "CLAUDE.md": "# CLAUDE.md\n\nEste arquivo orienta o Claude Code neste repositório.\n\n## O que é este repositório\n\nContexto da campanha de lançamento do protetor solar\nda marca. Estágio atual: definindo o slogan, com\nlançamento em 15/12.\n\n## Sobre mim\n\n- **Papel:** responsável pela comunicação da marca\n- **Restrições:** verba de R$ 80 mil; tudo passa\n  pela aprovação do diretor de marketing\n- **Histórico:** em março, uma comparação de preço\n  com o concorrente virou crise nas redes\n\n**Preferências de comunicação:**\n- Direto, com argumentos que eu possa levar ao diretor\n- Me avise quando uma ideia fugir do tom da marca\n\n## Estrutura do repositório\n\nmarca/         → tom de voz e o que a marca não diz\naprendizados/  → o que funcionou e o que deu errado\ndecisoes/      → o que já foi aprovado, e por quê\nplano/         → entregas e prazos\natas/          → reuniões e alinhamentos\n\n## Comandos disponíveis\n\n- `/debrief` — revisa a conversa e propõe o que guardar.\n  Pede aprovação antes de escrever.\n- `/backup` — salva uma cópia de segurança no GitHub.\n\n## Como me ajudar\n\n- Ideia de texto ou slogan → conferir com\n  `marca/tom-de-voz.md` e `aprendizados/`\n- Toda aprovação → `decisoes/aprovacoes.md`, com o motivo\n- Prazos e entregas → `plano/proximos-passos.md`",
+   "marca/tom-de-voz.md": "# Tom de voz\n\n## Como a marca fala\n- Próxima e honesta, como alguém que entende\n  de pele\n- Explica o porquê, sem jargão técnico\n\n## O que a marca não diz\n- Promessa exagerada (\"o melhor\", \"milagroso\")\n- Comparação direta com concorrente\n- Preço como argumento principal",
+   "aprendizados/campanhas-anteriores.md": "# Campanhas anteriores\n\n## Hidratante — março\n- O anúncio comparou nosso preço com o do\n  concorrente\n- Virou crise: comentários acusando a marca de\n  desvalorizar o próprio produto\n- Aprendizado: falar de preço só como \"justo\",\n  nunca em comparação\n\n## Linha infantil — julho\n- Vídeos com dermatologistas explicando o produto\n- Melhor engajamento do ano\n- Aprendizado: explicar funciona melhor que prometer",
+   "decisoes/aprovacoes.md": "# Aprovações\n\n- Conceito \"proteção que acompanha o seu dia\":\n  aprovado pelo diretor em 28/10\n- Canais: Instagram, TikTok e farmácias parceiras",
+   "plano/proximos-passos.md": "# Próximos passos\n\n- [ ] Fechar o slogan (até 12/11)\n- [ ] Roteiro dos vídeos com dermatologistas (até 20/11)\n- [ ] Peças para farmácias parceiras (até 1/12)",
+   "plano/proximos-passos.md@2": "# Próximos passos\n\n- [ ] Fechar o slogan (até 12/11)\n      Antes: testar as duas versões nesta semana\n- [ ] Roteiro dos vídeos com dermatologistas (até 20/11)\n- [ ] Peças para farmácias parceiras (até 1/12)",
+   "atas/2026-11-08-slogan-com-diretor.md": "# Slogan — conversa com o diretor (08/11)\n\n- Proposta do diretor: \"o protetor mais barato do\n  mercado\"\n- Recusada: fora do tom da marca e igual ao que\n  gerou a crise de março\n- Combinado: testar duas versões antes de fechar\n  - \"proteção de verdade, com preço justo\"\n  - \"proteção que acompanha o seu dia\"",
+   ".claude/commands/debrief.md": "---\ndescription: Revisa a conversa e propõe o que guardar\n---\n\nRevise esta conversa e identifique o que vale guardar\nno repositório: aprovações, aprendizados, prazos.\n\nPara cada item, diga o que é, em qual arquivo vai\nficar e mostre um rascunho. Espere minha aprovação\nantes de escrever qualquer arquivo.",
+   ".claude/commands/backup.md": "---\ndescription: Salva uma cópia de segurança no GitHub\n---\n\nConfira o que mudou desde a última cópia, salve as\nmudanças com uma descrição curta e envie para o\nGitHub. Se encontrar algo que pareça senha ou dado\nsensível, pare e me avise antes."
+  },
+  "home": {
+   "c1": "Você cuida da comunicação de uma marca de cosméticos e vai lançar um protetor solar. Abre o chat e conta tudo: o tom de voz da marca, o público, o prazo, o que deu errado na campanha de março.",
+   "c1aside": "Foram 45 mensagens. A IA ajudou bastante.",
+   "c1label": "chat · conversa sobre a campanha",
+   "b1": "Nosso tom é próximo e honesto: nada de promessa exagerada.",
+   "b2": "O lançamento é dia 15 de dezembro, para pegar o verão.",
+   "b3": "Em março, um anúncio comparando preço com o concorrente gerou crise.",
+   "more": "+ 42 mensagens",
+   "c2": "Uma semana depois, o diretor sugere um slogan: “o protetor mais barato do mercado”. Você abre uma conversa nova e pergunta se dá para usar.",
+   "ask": "O diretor quer anunciar como “o protetor mais barato do mercado”. Pode?",
+   "forgot": "Pode funcionar, depende da estratégia. Qual é o posicionamento da marca? Preço é um diferencial que vocês querem destacar?",
+   "tree": [
+    [
+     "marca/",
+     "tom de voz e o que a marca não diz"
+    ],
+    [
+     "aprendizados/",
+     "o que funcionou e o que deu errado"
+    ],
+    [
+     "plano/",
+     "entregas e prazos"
+    ]
+   ],
+   "c4label": "claude · na pasta da campanha",
+   "src": "⎿ Lendo aprendizados/campanhas-anteriores.md",
+   "answer": "Eu não usaria. Comparar preço com concorrente foi o que gerou a crise em <b>março</b>, e o tom combinado evita promessa exagerada. Uma alternativa no tom da marca: “proteção de verdade, com preço justo”."
+  }
+ }
+};
+let T = THEMES.reforma, F = T.F, tema = "reforma";
 
 const ROTEIRO = `Quero criar um repositório de contexto nesta pasta: arquivos em markdown que você vai ler em toda conversa para me ajudar com um assunto da minha vida.
 
@@ -959,13 +1299,13 @@ No fim, me mostre o que criou e pergunte se quero ajustar algo.`;
 
 /* ---------- Passos ---------- */
 const CHAPTERS = ["O problema", "Montando", "Uma semana depois", "Guardando", "Sua vez"];
-const HOME = "~ $", REPO = "~/Documents/reforma-apartamento $";
-const BASE_FILES = ["CLAUDE.md", "decisoes/escolhas.md", "orcamentos/pedreiro-joao.md", "plano/proximos-passos.md", "atas/", ".claude/commands/debrief.md", ".claude/commands/backup.md"];
+const HOME = "~ $";
 
-const STEPS = [
+function buildSteps(T) {
+  const REPO = `~/Documents/${T.folder} $`;
+  return [
   { ch: 0, title: "Você já passou por isso",
-    body: `<p>Três dias atrás você passou uma hora explicando a reforma do seu apartamento para a IA: orçamento, prazos, o que já tinha decidido.</p>
-<p>Hoje chegou o orçamento do marceneiro, você abriu uma conversa nova e a IA não lembra de nada. Ou você explica tudo de novo, ou garimpa a conversa antiga no meio de dezenas de outras.</p>
+    body: T.s1 + `
 <p>Este passo a passo mostra outro jeito de trabalhar, em que a IA começa toda conversa já sabendo do seu assunto.</p>`,
     apply: s => { s.mode = "chat"; } },
 
@@ -984,7 +1324,7 @@ const STEPS = [
 
   { ch: 1, title: "Criando a pasta, sem digitar nada",
     body: `<p>No Explorador, clique em <b>Abrir pasta</b> (ou use o menu File → Open Folder).</p>
-<p>Abre a mesma janela que você já usa para abrir qualquer arquivo do computador. Escolha onde guardar, por exemplo em <b>Documentos</b>, clique em <b>Nova pasta</b> e dê um nome a ela: <b>reforma-apartamento</b>.</p>
+<p>Abre a mesma janela que você já usa para abrir qualquer arquivo do computador. Escolha onde guardar, por exemplo em <b>Documentos</b>, clique em <b>Nova pasta</b> e dê um nome a ela: <b>${T.folder}</b>.</p>
 <p>Prefira um nome curto, sem espaços nem acentos.</p>`,
     apply: s => { s.dialog = true; s.focus = "openbtn"; } },
 
@@ -992,7 +1332,7 @@ const STEPS = [
     body: `<p>Clique em <b>Abrir</b>. O nome da pasta aparece no topo do Explorador. Ela está vazia por enquanto.</p>
 <p>É uma pasta comum do seu computador: se você abrir o Finder (ou o Explorador de Arquivos) e for em Documentos, ela estará lá.</p>
 <p>Repare no terminal: ele já está "dentro" da pasta. Tudo o que o Claude fizer a partir daqui acontece nela.</p>`,
-    apply: s => { s.folder = "reforma-apartamento"; s.ps = REPO; s.focus = "side"; } },
+    apply: s => { s.folder = T.folder; s.ps = REPO; s.focus = "side"; } },
 
   { ch: 1, title: "O único comando que você vai digitar",
     body: `<p>No terminal, digite <code>claude</code> e aperte Enter. Isso abre o Claude Code.</p>
@@ -1002,32 +1342,26 @@ const STEPS = [
 
   { ch: 1, title: "A entrevista",
     body: `<p>Você cola um roteiro pronto (ele está no fim deste passo a passo) e o Claude começa a te entrevistar sobre o assunto.</p>
-<p>Responda com sinceridade, inclusive sobre o que você não sabe. Repare na última resposta: dizer que nunca fez uma obra muda o jeito como ele vai te ajudar.</p>`,
+<p>Responda com sinceridade, inclusive sobre o que você não sabe. ${T.interviewNote}</p>`,
     apply: s => {
       s.term.push(
         { t: "paste", c: "[Você colou o roteiro de criação do repositório · 24 linhas]" },
         { t: "claude", c: "Vou te fazer algumas perguntas antes de criar qualquer arquivo. Primeiro: sobre o que é este repositório?" },
-        { t: "user", c: "A reforma do meu apartamento: cozinha e banheiro social." },
-        { t: "claude", c: "Em que pé está a reforma, e quais são as suas restrições?" },
-        { t: "user", c: "Estou recebendo orçamentos. Tenho R$ 45 mil no total e preciso terminar até março. Já tenho o do pedreiro João: R$ 13.500." },
-        { t: "claude", c: "Você já fez uma obra antes?" },
-        { t: "user", c: "Nunca. Meu medo é aceitar um orçamento ruim por não saber comparar." },
-        { t: "tool", c: "(mais 4 perguntas sobre decisões já tomadas e como você quer ser ajudado)" });
+        ...T.interview,
+        { t: "tool", c: T.interviewMore });
       s.focus = "term";
     } },
 
   { ch: 1, title: "O Claude monta a estrutura",
     body: `<p>Com as suas respostas, o Claude cria os arquivos. Cada pasta guarda um tipo de informação:</p>
-<ul><li><b>orcamentos/</b>: uma proposta por fornecedor</li>
-<li><b>decisoes/</b>: o que já foi decidido e por quê</li>
-<li><b>plano/</b>: próximos passos e prazos</li>
-<li><b>atas/</b>: conversas e visitas</li></ul>
+<ul>${T.dirs.map(([d, x]) => `<li><b>${d}</b>: ${x}</li>`).join("")}</ul>
 <p>A pasta <b>.claude</b> guarda dois comandos, <code>/debrief</code> e <code>/backup</code>, que você vai usar mais adiante.</p>`,
     apply: s => {
+      const criados = T.base.filter(f => !f.startsWith(".claude/")).concat(".claude/commands/debrief.md e backup.md");
       s.term.push({ t: "claude", c: "Entendi. Vou criar a estrutura do repositório:" },
-        ...["CLAUDE.md", "decisoes/escolhas.md", "orcamentos/pedreiro-joao.md", "plano/proximos-passos.md", "atas/", ".claude/commands/debrief.md e backup.md"].map(c => ({ t: "tool", ok: true, c: "✓ " + c })),
+        ...criados.map(c => ({ t: "tool", ok: true, c: "✓ " + c })),
         { t: "claude", c: "Pronto. Dá uma olhada no `CLAUDE.md` e me diz se quer ajustar algo." });
-      s.files = BASE_FILES.slice();
+      s.files = T.base.slice();
       s.focus = "side";
     } },
 
@@ -1038,69 +1372,53 @@ const STEPS = [
     apply: s => { s.open = "CLAUDE.md"; s.focus = "editor"; } },
 
   { ch: 1, title: "Onde ficam os fatos",
-    body: `<p>O CLAUDE.md diz onde as coisas estão. Os fatos ficam nos outros arquivos.</p>
-<p>Aqui, em <b>decisoes/escolhas.md</b>, está o que você já decidiu e quanto pode gastar com cada parte da obra.</p>
-<p>Guarde o teto de <b>R$ 12.000 para marcenaria</b>. Ele vai aparecer de novo.</p>`,
-    apply: s => { s.open = "decisoes/escolhas.md"; s.ref = { "decisoes/escolhas.md": [13] }; s.focus = "editor"; } },
+    body: T.factsBody,
+    apply: s => { s.open = T.factsFile; s.ref = { [T.factsFile]: T.factsRef }; s.focus = "editor"; } },
 
   { ch: 2, title: "Uma semana depois",
-    body: `<p>Você fechou tudo e seguiu a vida. Aí chegou o orçamento do marceneiro.</p>
+    body: `<p>Você fechou tudo e seguiu a vida. ${T.laterLine}</p>
 <p>É a mesma situação do chat lá do começo. Vamos ver o que muda.</p>`,
     apply: s => { s.mode = "desktop"; s.desk = "later"; s.term = []; s.tabs = []; s.open = null; s.claude = false; } },
 
   { ch: 2, title: "Voltando ao repositório",
-    body: `<p>Abra o VS Code e a pasta da reforma (menu File → Open Folder, ou a lista de pastas recentes). No terminal, digite <code>claude</code> de novo.</p>
+    body: `<p>Abra o VS Code e ${T.short} (menu File → Open Folder, ou a lista de pastas recentes). No terminal, digite <code>claude</code> de novo.</p>
 <p>Não tem nada para instalar e nada para reexplicar. Ao abrir, o Claude lê o CLAUDE.md por conta própria.</p>`,
     apply: s => { s.mode = "vs"; s.term.push({ t: "prompt", ps: REPO, c: "claude" }, { t: "box" }); s.claude = true; s.focus = "term"; } },
 
   { ch: 2, title: "A mesma pergunta, outra resposta",
-    body: `<p>Você fez exatamente a pergunta do chat. Desta vez o Claude consultou seus arquivos e respondeu com os seus números: o teto da marcenaria, a reserva para imprevistos e o prazo dos outros orçamentos.</p>
+    body: `<p>${T.answerNote}</p>
 <p>No editor, as linhas em amarelo são de onde ele tirou a informação.</p>
 <p><b>Você não explicou nada.</b> Essa é a diferença em relação ao chat.</p>`,
     apply: s => {
-      s.term.push(
-        { t: "user", c: "O marceneiro Paulo mandou R$ 15.800 pelos armários da cozinha. Cabe no meu orçamento?" },
-        { t: "tool", c: "Lendo decisoes/escolhas.md" },
-        { t: "tool", c: "Lendo plano/proximos-passos.md" },
-        { t: "claude", c: "Não cabe no que você planejou. O teto de marcenaria é **R$ 12.000** (`decisoes/escolhas.md`), então esse orçamento passa R$ 3.800.\n\nSe fechar assim, a reserva para imprevistos cai de R$ 4.000 para R$ 200, antes de a obra começar.\n\nAntes de decidir:\n1. Ainda faltam 2 dos 3 orçamentos de marcenaria (prazo 15/11, em `plano/proximos-passos.md`).\n2. Pergunte ao Paulo se trocar o MDF laca por MDF texturizado baixa o valor." });
-      s.open = "decisoes/escolhas.md"; s.ref = { "decisoes/escolhas.md": [13, 17] }; s.focus = "term";
+      s.term.push({ t: "user", c: T.ask }, ...T.reads.map(r => ({ t: "tool", c: "Lendo " + r })), { t: "claude", c: T.answer });
+      s.open = T.answerFile; s.ref = { [T.answerFile]: T.answerRef }; s.focus = "term";
     } },
 
   { ch: 2, title: "A conversa continua",
-    body: `<p>Você negociou com o marceneiro e decidiu esperar os outros orçamentos.</p>
+    body: `<p>${T.continueNote}</p>
 <p>Isso é informação nova, que por enquanto só existe nesta conversa. Se você fechar agora, ela se perde.</p>`,
-    apply: s => {
-      s.term.push(
-        { t: "user", c: "Ele topou fazer em MDF texturizado por R$ 12.900. Vou esperar os outros dois orçamentos antes de decidir." },
-        { t: "claude", c: "Boa. Com R$ 12.900 você fica R$ 900 acima do teto, e a reserva cairia para R$ 3.100. Os outros dois orçamentos vencem em 15/11." });
-      s.focus = "term";
-    } },
+    apply: s => { s.term.push(...T.cont); s.focus = "term"; } },
 
   { ch: 3, title: "/debrief: o que vale guardar?",
     body: `<p>No fim da conversa, digite <code>/debrief</code>. O Claude revisa o que foi conversado e propõe o que guardar e em qual arquivo.</p>
-<p>Ele não escreve nada sem você aprovar. E também diz o que não vai mexer: como nada foi decidido ainda, o arquivo de decisões fica como está.</p>`,
-    apply: s => {
-      s.term.push(
-        { t: "user", c: "/debrief" },
-        { t: "claude", c: "Revisei a conversa. Proponho guardar:\n\n1. `orcamentos/marcenaria-paulo.md` (novo)\n   Proposta do Paulo: R$ 15.800 em laca, R$ 12.900 em MDF texturizado.\n\n2. `plano/proximos-passos.md` (editar)\n   Decidir a marcenaria só depois dos 3 orçamentos.\n\nNão vou mexer em `decisoes/escolhas.md`: nada foi decidido ainda.\n\nPosso salvar?" });
-      s.focus = "term";
-    } },
+<p>Ele não escreve nada sem você aprovar. ${T.debriefNote}</p>`,
+    apply: s => { s.term.push({ t: "user", c: "/debrief" }, { t: "claude", c: T.debrief }); s.focus = "term"; } },
 
   { ch: 3, title: "Os arquivos se atualizam",
     body: `<p>Com o seu ok, o Claude cria e edita os arquivos. As linhas em verde no editor são as novas.</p>
 <p>As letras na lista de arquivos mostram o que mudou: <b>U</b> para arquivo novo, <b>M</b> para arquivo modificado.</p>
-<p>Na próxima conversa, o Claude já vai saber que você está esperando os outros orçamentos.</p>`,
+<p>${T.updateNote}</p>`,
     apply: s => {
       s.term.push({ t: "user", c: "pode salvar" },
-        { t: "tool", ok: true, c: "✓ orcamentos/marcenaria-paulo.md (novo)" },
-        { t: "tool", ok: true, c: "✓ plano/proximos-passos.md (editado)" },
+        { t: "tool", ok: true, c: `✓ ${T.newFile} (novo)` },
+        { t: "tool", ok: true, c: `✓ ${T.editFile} (editado)` },
         { t: "claude", c: "Salvo. Quando quiser, rode `/backup` para guardar uma cópia." });
-      s.files.push("orcamentos/marcenaria-paulo.md");
-      s.contents["plano/proximos-passos.md"] = F["plano/proximos-passos.md@2"];
-      s.changed = { "orcamentos/marcenaria-paulo.md": "U", "plano/proximos-passos.md": "M" };
-      s.tabs = ["orcamentos/marcenaria-paulo.md"];
-      s.open = "plano/proximos-passos.md"; s.hl = { "plano/proximos-passos.md": [4, 5] };
-      s.fresh = ["orcamentos/marcenaria-paulo.md"];
+      s.files.push(T.newFile);
+      s.contents[T.editFile] = T.F[T.editFile + "@2"];
+      s.changed = { [T.newFile]: "U", [T.editFile]: "M" };
+      s.tabs = [T.newFile];
+      s.open = T.editFile; s.hl = { [T.editFile]: T.editHl };
+      s.fresh = [T.newFile];
       s.focus = "editor";
     } },
 
@@ -1128,7 +1446,9 @@ const STEPS = [
     body: `<p>Ao lado está o passo a passo para montar o seu, com os comandos e o roteiro prontos para copiar.</p>
 <p>Escolha um assunto em que você gostaria de ter ajuda constante, e não só uma pergunta isolada. Não precisa ser grande nem definitivo.</p>`,
     apply: s => { s.mode = "guide"; } },
-];
+  ];
+}
+let STEPS = buildSteps(T);
 
 /* ---------- Estado ---------- */
 function fresh() {
@@ -1168,10 +1488,10 @@ function chatHTML() {
   return `<div class="win chat"><div class="titlebar"><div class="lights"><i></i><i></i><i></i></div><div class="t">Chat de IA</div></div>
   <div class="chatbody">
     <div class="sep">3 dias atrás</div>
-    <div class="old">Você explicou a reforma inteira: orçamento total, teto por item, prazos, o orçamento do pedreiro e o que já tinha decidido. <b>42 mensagens.</b></div>
+    <div class="old">${T.chat.old}</div>
     <div class="sep">Nova conversa · hoje</div>
-    <div class="msg me">O marceneiro Paulo mandou R$ 15.800 pelos armários da cozinha. Cabe no meu orçamento?</div>
-    <div class="msg ai">Para avaliar, preciso de mais informações. Qual é o seu orçamento total para a reforma? Quanto você planejou gastar com marcenaria? Já recebeu outros orçamentos para comparar?</div>
+    <div class="msg me">${T.chat.me}</div>
+    <div class="msg ai">${T.chat.ai}</div>
   </div>
   <div class="chatinput">Escreva uma mensagem…</div></div>`;
 }
@@ -1187,7 +1507,7 @@ function desktopHTML(s) {
   if (s.desk === "later") return `<div class="desktop">
     <div class="cal">sáb, 8 de novembro</div>
     <h3>Uma semana depois</h3>
-    <p>Chegou o orçamento do marceneiro.</p></div>`;
+    <p>${T.laterDesk}</p></div>`;
   return `<div class="desktop">
     <h3>Abrir → conversar → /debrief → /backup</h3>
     <p>Quatro passos, sempre os mesmos. A cada volta, seus arquivos ficam mais completos e o Claude começa a conversa sabendo mais.</p></div>`;
@@ -1248,7 +1568,7 @@ function vsHTML(s) {
 }
 
 function dialogHTML() {
-  return `<div class="dlg-wrap"><div class="dlg" role="img" aria-label="Janela de abrir pasta, com a nova pasta reforma-apartamento criada em Documentos">
+  return `<div class="dlg-wrap"><div class="dlg" role="img" aria-label="Janela de abrir pasta, com a nova pasta ${T.folder} criada em Documentos">
     <div class="dlg-title">Abrir pasta</div>
     <div class="dlg-body">
       <div class="dlg-side"><b>Favoritos</b><span>Mesa</span><span class="on">Documentos</span><span>Downloads</span></div>
@@ -1256,7 +1576,7 @@ function dialogHTML() {
         <div class="dlg-path">Documentos</div>
         <div class="dlg-row"><i></i>Fotos da viagem</div>
         <div class="dlg-row"><i></i>Impostos 2026</div>
-        <div class="dlg-row sel"><i></i>reforma-apartamento<em>nova pasta</em></div>
+        <div class="dlg-row sel"><i></i>${T.folder}<em>nova pasta</em></div>
       </div>
     </div>
     <div class="dlg-foot"><span class="dlg-btn spotb">Nova pasta</span><span class="grow"></span><span class="dlg-btn">Cancelar</span><span class="dlg-btn pri">Abrir</span></div>
@@ -1293,7 +1613,7 @@ function lineEl(l) {
   else if (l.t === "paste") { d.classList.add("user"); d.innerHTML = `<span class="gt">&gt;</span> <span class="paste">${esc(l.c)}</span>`; }
   else if (l.t === "claude") { d.classList.add("claude"); d.innerHTML = `<span class="dot">●</span><span>${inline(l.c)}</span>`; }
   else if (l.t === "tool") { d.classList.add("tool"); if (l.ok) d.classList.add("ok"); d.innerHTML = `⎿ ${inline(l.c)}`; }
-  else if (l.t === "box") { d.innerHTML = `<div class="box"><b>✻ Claude Code</b><div>pasta: ~/Documents/reforma-apartamento</div></div>`; }
+  else if (l.t === "box") { d.innerHTML = `<div class="box"><b>✻ Claude Code</b><div>pasta: ~/Documents/${T.folder}</div></div>`; }
   return d;
 }
 const typed = l => l.t === "prompt" || l.t === "user";
@@ -1332,12 +1652,30 @@ async function fillTerm(s, from, token) {
 /* ---------- Navegação ---------- */
 let cur = 0, animToken = 0;
 
-/* "/" é a página inicial. Cada passo tem um endereço próprio (/passo-N)
-   para o Vercel Analytics contar quantas pessoas chegaram a cada passo. */
-const pathFor = i => `/passo-${i + 1}`;
-function stepFromPath() {
-  const m = location.pathname.match(/^\/passo-(\d+)\/?$/);
-  return m ? Math.max(0, Math.min(STEPS.length - 1, +m[1] - 1)) : -1;
+/* "/" é a página inicial. Cada passo tem um endereço próprio para o Vercel
+   Analytics contar quantas pessoas chegaram a cada passo, separado por
+   exemplo: /passo-N (reforma), /confeitaria/passo-N, /campanha/passo-N. */
+const pathFor = i => (tema === "reforma" ? "" : `/${tema}`) + `/passo-${i + 1}`;
+function parsePath() {
+  const m = location.pathname.match(/^\/(?:(confeitaria|campanha)\/)?passo-(\d+)\/?$/);
+  return m ? { tema: m[1] || "reforma", passo: +m[2] - 1 } : null;
+}
+function setTheme(k) {
+  if (!THEMES[k]) k = "reforma";
+  tema = k; T = THEMES[k]; F = T.F; STEPS = buildSteps(T);
+  try { localStorage.setItem("tema", k); } catch {}
+  document.querySelectorAll("select.tema").forEach(el => { el.value = k; });
+  fillLanding(false);
+}
+function fillLanding(animar) {
+  const d = T.home;
+  document.querySelectorAll("[data-t]").forEach(el => { el.innerHTML = el.dataset.t === "label" ? T.label : d[el.dataset.t]; });
+  const tree = $("tree");
+  if (tree) tree.innerHTML = `<span class="troot">${T.folder}/</span>
+    <div class="row main"><span>CLAUDE.md</span><span>quem você é e onde está cada coisa</span></div>` +
+    d.tree.map(([n, x]) => `<div class="row"><span>${n}</span><span>${x}</span></div>`).join("");
+  const story = $("story");
+  if (animar && story) { story.classList.remove("swap"); void story.offsetWidth; story.classList.add("swap"); }
 }
 function pushPath(p) {
   if (location.pathname === p) return;
@@ -1350,8 +1688,10 @@ function showLanding(push) {
   window.scrollTo(0, 0);
 }
 function route() {
-  const k = stepFromPath();
-  if (k < 0) showLanding(false); else go(k, false, false);
+  const p = parsePath();
+  if (!p) { showLanding(false); return; }
+  if (p.tema !== tema) setTheme(p.tema);
+  go(p.passo, false, false);
 }
 
 function go(i, animate, push = true) {
@@ -1416,7 +1756,17 @@ $("screen").addEventListener("click", async e => {
   setTimeout(() => { b.textContent = "Copiar"; }, 1800);
 });
 
+document.querySelectorAll("select.tema").forEach(el => el.addEventListener("change", () => {
+  setTheme(el.value);
+  if (document.body.classList.contains("is-landing")) fillLanding(true);
+  else go(cur, false);
+}));
 window.addEventListener("popstate", route);
+{
+  let salvo = "reforma";
+  try { salvo = localStorage.getItem("tema") || "reforma"; } catch {}
+  setTheme(salvo);
+}
 route();
 </script>
 <!-- Vercel Speed Insights (só funciona no site publicado no Vercel) -->
