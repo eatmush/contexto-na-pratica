@@ -121,6 +121,18 @@ code { font-family: var(--font-mono); font-size: .88em; }
 .toolcard .ic { font-family: var(--font-mono); font-size: 12px; display: inline-block; border-radius: 6px; padding: 2px 7px; margin-bottom: 10px; background: var(--lime); color: var(--ink); }
 .cal { font-family: var(--font-mono); font-size: 13px; background: rgba(255,255,255,.1); border-radius: 8px; padding: 6px 12px; color: #dfe7ee; }
 
+/* Cartão "quando o caderno cresce" */
+.growcard { width: min(560px, 100%); background: #fff; color: var(--ink); border-radius: 14px; padding: 20px 22px; text-align: left; display: flex; flex-direction: column; gap: 8px; font-family: var(--font-mono); font-size: 13.5px; box-shadow: 0 18px 50px rgba(0,0,0,.3); }
+.gr-label { font-size: 12px; color: var(--muted); }
+.gr-root { font-weight: 600; }
+.gr-row { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 12px; align-items: baseline; padding-left: 18px; }
+.gr-row span:last-child { font-family: var(--font-body); font-size: 14px; color: var(--muted); }
+.gr-row span:last-child::before { content: "← "; color: var(--ink); }
+.gr-row.main span:first-child { background: var(--lime); border-radius: 4px; padding: 0 4px; justify-self: start; }
+.gr-layer { font-size: 11.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-top: 8px; padding-left: 18px; }
+.gr-layer::after { content: ""; display: block; border-top: 1px dashed #c9cfcb; margin-top: 4px; }
+@media (max-width: 600px) { .gr-row { grid-template-columns: minmax(0, 1fr); gap: 0; } }
+
 /* VS Code simulado */
 .win.vs { background: var(--vs-bg); color: var(--vs-text); }
 .win.vs .titlebar { background: #18191c; color: var(--vs-dim); border-bottom: 1px solid #000; }
@@ -632,7 +644,7 @@ body:not(.is-landing) .landing { display: none; }
   <section class="hero">
     <div class="kicker">uma história curta sobre IA e memória</div>
     <h1>Você já contou a mesma história para a IA. <span class="hl">Mais de uma vez.</span></h1>
-    <p>Este site mostra, em 19 passos, como fazer o Claude lembrar do seu assunto de uma conversa para outra. Sem programar, e com um exemplo de verdade:
+    <p>Este site mostra, em 20 passos, como fazer o Claude lembrar do seu assunto de uma conversa para outra. Sem programar, e com um exemplo de verdade:
       <label class="pick-wrap"><span class="sr">Escolha o exemplo</span><select id="tema" class="tema">
         <option value="reforma">a reforma de um apartamento</option>
         <option value="confeitaria">uma confeitaria por encomenda</option>
@@ -805,31 +817,6 @@ body:not(.is-landing) .landing { display: none; }
           <p>Não. Para assistir ao passo a passo, só o navegador. Para fazer no seu computador: um Mac ou Windows e um plano pago do Claude, como o Pro.</p>
           <p>É para quem já usa ChatGPT ou Claude no dia a dia, nunca abriu um terminal e quer que a IA acompanhe um assunto ao longo do tempo: uma reforma, um negócio, um projeto do trabalho, um hobby.</p>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="block grow">
-    <div class="grow-text">
-      <span class="day">mais adiante</span>
-      <h2>Quando o caderno cresce</h2>
-      <p>Comece com um assunto. Quando ele virar uma área inteira, como o seu trabalho, com tarefas chegando toda semana, o caderno ganha duas camadas.</p>
-      <p><b>Referência</b> é o que é verdade e muda devagar: o tom de voz, as regras, o passo a passo do que se repete. <b>Tarefas</b> é o que você está fazendo agora: uma pasta por tarefa, que vai para o arquivo quando termina.</p>
-      <p>No fim de cada tarefa, o <code>/debrief</code> leva o que você aprendeu para a referência. A tarefa vai para o arquivo, mas o aprendizado fica.</p>
-    </div>
-    <div class="scene" aria-label="Exemplo de caderno de uma área de trabalho, com referência e tarefas">
-      <span class="label">exemplo · a área de comunicação inteira</span>
-      <div class="tree">
-        <span class="troot">comunicacao-da-marca/</span>
-        <div class="row main"><span>CLAUDE.md</span><span>o índice: para cada assunto, onde ler</span></div>
-        <span class="layer">referência</span>
-        <div class="row"><span>marca/</span><span>tom de voz e o que a marca não diz</span></div>
-        <div class="row"><span>aprendizados/</span><span>o que funcionou e o que deu errado</span></div>
-        <div class="row"><span>como-fazer/</span><span>o passo a passo do que se repete</span></div>
-        <span class="layer">tarefas</span>
-        <div class="row"><span>agora/</span><span>2026-11-08 Slogan do protetor</span></div>
-        <div class="row"><span>acompanhando/</span><span>Relatório mensal das redes</span></div>
-        <div class="row"><span>arquivo/</span><span>2026-03 Hidratante, e mais 40 tarefas</span></div>
       </div>
     </div>
   </section>
@@ -1010,6 +997,39 @@ const THEMES = {
    "c4label": "claude · na pasta da reforma",
    "src": "⎿ Lendo decisoes/escolhas.md",
    "answer": "Não cabe no que você planejou. O teto de marcenaria é <b>R$ 12.000</b>, então passa R$ 3.800, e a sua reserva para imprevistos cairia para R$ 200."
+  },
+  "grow": {
+   "intro": "Na reforma, por exemplo: quando a cozinha ficar pronta, a pasta pode virar o caderno da casa inteira.",
+   "area": "a casa inteira",
+   "root": "minha-casa/",
+   "ref": [
+    [
+     "imovel/",
+     "planta, medidas e o que já foi trocado"
+    ],
+    [
+     "fornecedores/",
+     "quem trabalhou bem, e quem não"
+    ],
+    [
+     "como-fazer/",
+     "o passo a passo do que se repete"
+    ]
+   ],
+   "tasks": [
+    [
+     "agora/",
+     "2026-11 Reforma da cozinha"
+    ],
+    [
+     "acompanhando/",
+     "Manutenção do ar-condicionado"
+    ],
+    [
+     "arquivo/",
+     "2025-06 Pintura da sala, e mais 12"
+    ]
+   ]
   }
  },
  "confeitaria": {
@@ -1156,6 +1176,39 @@ const THEMES = {
    "c4label": "claude · na pasta da confeitaria",
    "src": "⎿ Lendo precos/receitas.md",
    "answer": "Com 20% de desconto, o brigadeiro sai a <b>R$ 2,80</b> e a margem cai para 36%, abaixo dos 40% que você definiu. Até 14% de desconto você fica dentro da regra. Que tal oferecer 10%?"
+  },
+  "grow": {
+   "intro": "Na confeitaria, por exemplo: cada pedido vira uma tarefa, e o que você aprende com eles vai para os preços e as regras.",
+   "area": "o negócio inteiro",
+   "root": "confeitaria/",
+   "ref": [
+    [
+     "precos/",
+     "custo e preço de cada receita"
+    ],
+    [
+     "clientes/",
+     "quem compra, o quê e quando"
+    ],
+    [
+     "como-fazer/",
+     "receitas, embalagem e entrega"
+    ]
+   ],
+   "tasks": [
+    [
+     "agora/",
+     "2026-11-22 Casamento, 200 brigadeiros"
+    ],
+    [
+     "acompanhando/",
+     "Encomendas do Buffet Estrela"
+    ],
+    [
+     "arquivo/",
+     "2026-10 Festa da Ana Paula, e mais 60"
+    ]
+   ]
   }
  },
  "campanha": {
@@ -1302,6 +1355,39 @@ const THEMES = {
    "c4label": "claude · na pasta da campanha",
    "src": "⎿ Lendo aprendizados/campanhas-anteriores.md",
    "answer": "Eu não usaria. Comparar preço com concorrente foi o que gerou a crise em <b>março</b>, e o tom combinado evita promessa exagerada. Uma alternativa no tom da marca: “proteção de verdade, com preço justo”."
+  },
+  "grow": {
+   "intro": "Na campanha, por exemplo: a pasta vira o caderno da área de comunicação inteira, e cada campanha vira uma tarefa.",
+   "area": "a área de comunicação inteira",
+   "root": "comunicacao-da-marca/",
+   "ref": [
+    [
+     "marca/",
+     "tom de voz e o que a marca não diz"
+    ],
+    [
+     "aprendizados/",
+     "o que funcionou e o que deu errado"
+    ],
+    [
+     "como-fazer/",
+     "o passo a passo do que se repete"
+    ]
+   ],
+   "tasks": [
+    [
+     "agora/",
+     "2026-11-08 Slogan do protetor"
+    ],
+    [
+     "acompanhando/",
+     "Relatório mensal das redes"
+    ],
+    [
+     "arquivo/",
+     "2026-03 Hidratante, e mais 40"
+    ]
+   ]
   }
  }
 };
@@ -1473,6 +1559,14 @@ function buildSteps(T) {
 <p>Cada volta deixa o Claude mais informado sobre o seu assunto. Serve para uma reforma, um negócio, o trabalho ou um hobby: um repositório por assunto.</p>`,
     apply: s => { s.mode = "desktop"; s.desk = "cycle"; } },
 
+  { ch: 4, title: "Quando o caderno cresce",
+    body: `<p>Comece com um assunto. Quando ele virar uma área inteira, com tarefas chegando toda semana, o caderno ganha duas camadas:</p>
+<ul><li><b>Referência:</b> o que é verdade e muda devagar, como as regras e o passo a passo do que se repete.</li>
+<li><b>Tarefas:</b> o que você está fazendo agora. Uma pasta por tarefa, que vai para o arquivo quando termina.</li></ul>
+<p>No fim de cada tarefa, o <code>/debrief</code> leva o que você aprendeu para a referência. A tarefa vai para o arquivo, mas o aprendizado fica.</p>
+<p>${T.grow.intro} Não precisa começar assim: é para quando a pasta pedir.</p>`,
+    apply: s => { s.mode = "desktop"; s.desk = "grow"; } },
+
   { ch: 4, title: "Agora no seu computador",
     body: `<p>Ao lado está o passo a passo para montar o seu, com os comandos e o roteiro prontos para copiar.</p>
 <p>Escolha um assunto em que você gostaria de ter ajuda constante, e não só uma pergunta isolada. Não precisa ser grande nem definitivo.</p>`,
@@ -1535,6 +1629,17 @@ function desktopHTML(s) {
       <div class="toolcard"><span class="ic">2</span><b>Terminal</b><span>Onde você digita comandos. Já vem dentro do VS Code.</span></div>
       <div class="toolcard"><span class="ic">3</span><b>Claude Code</b><span>O Claude rodando no terminal, lendo e editando a sua pasta. Usa a sua conta do Claude.</span></div>
     </div></div>`;
+  if (s.desk === "grow") {
+    const g = T.grow, row = ([n, x]) => `<div class="gr-row"><span>${n}</span><span>${x}</span></div>`;
+    return `<div class="desktop">
+    <div class="growcard" aria-label="Exemplo de caderno de ${g.area}, com referência e tarefas">
+      <span class="gr-label">exemplo · ${g.area}</span>
+      <span class="gr-root">${g.root}</span>
+      <div class="gr-row main"><span>CLAUDE.md</span><span>o índice: para cada assunto, onde ler</span></div>
+      <span class="gr-layer">referência</span>${g.ref.map(row).join("")}
+      <span class="gr-layer">tarefas</span>${g.tasks.map(row).join("")}
+    </div></div>`;
+  }
   if (s.desk === "later") return `<div class="desktop">
     <div class="cal">sáb, 8 de novembro</div>
     <h3>Uma semana depois</h3>
