@@ -646,6 +646,22 @@ body.is-landing { height: auto; min-height: 100%; background: #e4e5e2; }
 body.is-landing .top, body.is-landing .main { display: none; }
 body.is-done { height: auto; min-height: 100%; background: #e4e5e2; }
 body.is-done .top, body.is-done .main { display: none; }
+body.is-phone { height: auto; min-height: 100%; }
+body.is-phone .top, body.is-phone .main, body.is-phone #landing, body.is-phone #done { display: none; }
+body:not(.is-phone) #phone { display: none; }
+/* Tela "melhor no computador" (só em celular) */
+#phone .wrap { min-height: 100vh; display: flex; flex-direction: column; padding-bottom: 22px; }
+#phone .card { flex: 1; border-radius: 24px; padding: 32px 26px; display: flex; flex-direction: column; justify-content: center; gap: 18px; color: #ecebef; position: relative; overflow: hidden;
+  background: radial-gradient(60% 40% at 85% 12%, rgba(142,162,255,.55), transparent 70%), radial-gradient(50% 35% at 100% 80%, rgba(255,140,100,.45), transparent 70%), radial-gradient(60% 30% at 40% 105%, rgba(246,166,216,.35), transparent 70%), #0f1012; }
+#phone .card > * { position: relative; }
+#phone h1 { font-size: clamp(36px, 10vw, 52px); line-height: 1; }
+#phone h1 .hl { background: none; color: #ff9e7a; padding: 0; }
+#phone p { margin: 0; color: #c9cad3; font-size: 17px; }
+#phone .kicker { color: #a7a9b8; }
+#phone .btn { align-self: flex-start; }
+#phone .ok { color: #ff9e7a; font-size: 15px; min-height: 1.4em; }
+#phone .alt { display: flex; flex-direction: column; gap: 10px; padding-top: 18px; font-size: 15px; color: var(--muted); }
+#phone .alt a { color: var(--ink); }
 body:not(.is-done) #done { display: none; }
 
 /* Tela final: conquista + três saídas */
@@ -835,6 +851,25 @@ body:not(.is-landing) #landing { display: none; }
   <div class="home-below">
     <p class="skip-guide">Já viu o passo a passo? <a href="/passo-23" data-step="22">Ir direto para o guia</a></p>
     <p class="foot">dúvidas ou sugestões? <a href="https://www.linkedin.com/in/matcastella/" target="_blank" rel="noopener">fale comigo no linkedin</a></p>
+  </div>
+</div>
+</div>
+
+<div class="landing" id="phone">
+<div class="wrap">
+  <header class="head">
+    <a class="brand" href="/" data-home>Repositório de contexto <span class="hl">na prática</span></a>
+  </header>
+  <section class="card">
+    <div class="kicker">antes de começar</div>
+    <h1>Este passo a passo é melhor <span class="hl">no computador.</span></h1>
+    <p>Ele simula a tela de um computador, com o VS Code e o terminal. No celular fica apertado: o texto que explica cada passo fica embaixo da tela simulada.</p>
+    <button class="btn" id="phoneShare" type="button">Mandar o link para mim</button>
+    <span class="ok" id="phoneOk" aria-live="polite"></span>
+  </section>
+  <div class="alt">
+    <a href="#" id="phoneGo">Ver aqui mesmo assim</a>
+    <a href="/passo-23" id="phoneGuide">Ou ir direto para o guia, com os comandos</a>
   </div>
 </div>
 </div>
@@ -2122,13 +2157,14 @@ function pushPath(p) {
 }
 function showLanding(push) {
   animToken++; pending = false;
-  document.body.classList.remove("is-done");
+  document.body.classList.remove("is-done", "is-phone");
   if (push) pushPath("/");
   document.body.classList.add("is-landing");
   window.scrollTo(0, 0);
 }
 function route() {
   if (/^\/concluido\/?$/.test(location.pathname)) { showDone(false); return; }
+  if (/^\/no-celular\/?$/.test(location.pathname)) { if (isPhone() && !phoneOk) showPhone(false); else showLanding(false); return; }
   const p = parsePath();
   if (!p) { showLanding(false); return; }
   if (p.tema !== tema) setTheme(p.tema);
@@ -2164,6 +2200,32 @@ function renderPix() {
     : "Chave Pix não configurada.";
   document.querySelectorAll("#amounts button").forEach(b => b.classList.toggle("on", +b.dataset.v === pixValor));
 }
+/* Celular: sugere abrir no computador antes do passo a passo (dá para seguir mesmo assim) */
+const isPhone = () => matchMedia("(pointer: coarse) and (max-width: 820px)").matches;
+let phoneOk = false, phoneNext = 0;
+try { phoneOk = sessionStorage.getItem("ver-no-celular") === "1"; } catch {}
+function showPhone(push, next = 0) {
+  animToken++; pending = false; phoneNext = next;
+  if (push) pushPath("/no-celular");
+  $("phoneOk").textContent = "";
+  document.body.classList.remove("is-landing", "is-done");
+  document.body.classList.add("is-phone");
+  window.scrollTo(0, 0);
+}
+$("phoneShare").addEventListener("click", async () => {
+  const url = location.origin + "/";
+  try {
+    if (navigator.share) { await navigator.share({ title: "Tire a IA do chat", text: "Para abrir no computador:", url }); $("phoneOk").textContent = "Pronto. Abra no computador quando puder."; }
+    else { await navigator.clipboard.writeText(url); $("phoneOk").textContent = "Link copiado. Cole onde quiser guardar."; }
+  } catch (e) { if (e && e.name !== "AbortError") $("phoneOk").textContent = "Copie o endereço da página: " + url; }
+});
+$("phoneGo").addEventListener("click", e => {
+  e.preventDefault(); phoneOk = true;
+  try { sessionStorage.setItem("ver-no-celular", "1"); } catch {}
+  document.body.classList.remove("is-phone"); cur = -1; go(phoneNext, true);
+});
+$("phoneGuide").addEventListener("click", e => { e.preventDefault(); document.body.classList.remove("is-phone"); go(STEPS.length - 1, false); });
+
 function showDone(push) {
   animToken++; pending = false;
   if (push) pushPath("/concluido");
@@ -2179,7 +2241,7 @@ function showDone(push) {
   $("doneCp").textContent = s.cp;
   $("doneGuide").href = pathFor(STEPS.length - 1);
   renderPix();
-  document.body.classList.remove("is-landing");
+  document.body.classList.remove("is-landing", "is-phone");
   document.body.classList.add("is-done");
   window.scrollTo(0, 0);
 }
@@ -2237,6 +2299,8 @@ function setNarr(i, st, html) {
 
 function go(i, animate, push = true) {
   i = Math.max(0, Math.min(STEPS.length - 1, i));
+  if (isPhone() && !phoneOk && i < STEPS.length - 1) { showPhone(push, i); return; }
+  document.body.classList.remove("is-phone");
   if (push) pushPath(pathFor(i));
   document.body.classList.remove("is-landing", "is-done");
   const st = STEPS[i];
