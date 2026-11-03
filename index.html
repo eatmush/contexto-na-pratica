@@ -144,6 +144,18 @@ code { font-family: var(--font-mono); font-size: .88em; }
 /* Cartão "quando o caderno cresce" */
 .growcard { width: min(560px, 100%); background: #fff; color: var(--ink); border-radius: 14px; padding: 20px 22px; text-align: left; display: flex; flex-direction: column; gap: 8px; font-family: var(--font-mono); font-size: 13.5px; box-shadow: 0 18px 50px rgba(0,0,0,.3); }
 .gr-label { font-size: 12px; color: var(--muted); }
+.grow2 { display: flex; align-items: center; gap: 18px; width: min(820px, 100%); }
+.g2-card { background: #fff; color: var(--ink); border-radius: 14px; padding: 18px 20px; text-align: left; display: flex; flex-direction: column; gap: 5px; font-family: var(--font-mono); font-size: 13.5px; box-shadow: 0 18px 50px rgba(0,0,0,.3); flex: 1.25; min-width: 0; }
+.g2-card.g2-hoje { flex: .8; opacity: .92; }
+.g2-item { padding-left: 16px; }
+.g2-sub { padding-left: 32px; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.g2-sub b { background: var(--lime); border-radius: 4px; padding: 0 5px; font-weight: 600; }
+.g2-sub em { font-style: normal; font-family: var(--font-body); font-size: 13px; color: var(--muted); }
+.g2-inside { padding-left: 48px; font-size: 11.5px; color: var(--muted); }
+.g2-done { color: var(--muted); }
+.g2-up { font-style: normal; font-family: var(--font-body); font-size: 12.5px; color: var(--muted); margin-left: 6px; }
+.g2-arrow { font-size: 32px; color: #ecebef; flex: none; }
+@media (max-width: 760px) { .grow2 { flex-direction: column; } .g2-arrow { transform: rotate(90deg); } .g2-card { width: 100%; } }
 .gr-root { font-weight: 600; }
 .gr-row { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 12px; align-items: baseline; padding-left: 18px; }
 .gr-row span:last-child { font-family: var(--font-body); font-size: 14px; color: var(--muted); }
@@ -1510,6 +1522,32 @@ const V1 = {
 };
 for (const k in V1) Object.assign(THEMES[k], V1[k]);
 
+/* "Quando o caderno cresce": a pasta de hoje e a pasta maior */
+const GROW = {
+ reforma: {
+  root: "minha-casa/", area: "a casa inteira",
+  ref: ["fornecedores/", "imovel/", "como-fazer/"],
+  now: "reforma-apartamento/", nowNote: "a pasta de hoje", inside: ["orcamentos/", "decisoes/", "plano/", "atas/"], done: "pintura-da-sala/",
+  how: "Na reforma, a pasta que você montou vira uma tarefa dentro de uma pasta maior, a da casa.",
+  example: "No fim da obra, o <code>/debrief</code> anota em <b>fornecedores/</b> que o Paulo cumpriu o prazo. A reforma vai para <b>arquivo/</b>, mas na próxima obra o Claude já sabe em quem confiar."
+ },
+ confeitaria: {
+  root: "confeitaria/", area: "o negócio inteiro",
+  ref: ["precos/", "clientes/", "decisoes/", "como-fazer/"],
+  now: "casamento-22-11/", nowNote: "o pedido desta semana", inside: [], done: "festa-ana-paula/",
+  how: "Na confeitaria, a própria pasta já é o negócio: ela ganha uma camada de tarefas, e cada pedido grande vira uma pasta.",
+  example: "No fim do casamento, o <code>/debrief</code> anota em <b>clientes/</b> que a cliente pagou o sinal em dia e pediu mais 30 doces na véspera. O pedido vai para <b>arquivo/</b>, mas no próximo casamento o Claude já sugere prever uma sobra."
+ },
+ campanha: {
+  root: "comunicacao-da-marca/", area: "a área de comunicação inteira",
+  ref: ["marca/", "aprendizados/", "como-fazer/"], up: ["marca/", "aprendizados/"],
+  now: "campanha-protetor/", nowNote: "a pasta de hoje", inside: ["decisoes/", "plano/", "atas/"], done: "hidratante-marco/",
+  how: "Na campanha, a pasta que você montou vira uma tarefa dentro da pasta da área de comunicação. O tom da marca e os aprendizados sobem para a referência: valem para qualquer campanha.",
+  example: "No fim do lançamento, o <code>/debrief</code> anota em <b>aprendizados/</b> qual slogan venceu o teste. A campanha vai para <b>arquivo/</b>, e a próxima já parte desse resultado."
+ }
+};
+for (const k in GROW) THEMES[k].grow2 = GROW[k];
+
 let T = THEMES.reforma, F = T.F, tema = "reforma";
 
 const ROTEIRO = `Quero criar um repositório de contexto nesta pasta: arquivos em markdown que você vai ler em toda conversa para me ajudar com um assunto da minha vida.
@@ -1683,10 +1721,17 @@ function buildSteps(T) {
 
   /* ---------- Parte 4: Guardando ---------- */
   { ch: 3, title: "/debrief: o que vale guardar?",
-    act: { kind: "type", word: "/debrief", do: "No fim da conversa, digite <b>/debrief</b> e aperte <b>Enter</b>." },
-    body: `<p>O Claude revisa o que foi conversado e propõe o que guardar e em qual arquivo.</p>
-<p>Ele não escreve nada sem você aprovar. ${T.debriefNote}</p>`,
-    apply: s => { s.term.push({ t: "user", c: "/debrief" }, { t: "claude", c: T.debrief }); s.focus = "term"; } },
+    act: { stages: [
+      { kind: "click", target: "node:.claude/commands/debrief.md",
+        do: "Antes de guardar, conheça o <b>/debrief</b>. Ele é um <b>comando</b>: um arquivo de texto com instruções, que fica em <b>.claude/commands/</b>. Clique em <b>debrief.md</b> para ver o dele.",
+        after: s => { s.open = ".claude/commands/debrief.md"; if (!s.tabs.includes(s.open)) s.tabs.push(s.open); } },
+      { kind: "type", word: "/debrief",
+        do: "São instruções em português, como as que você escreveria no chat. Digitar <b>/debrief</b> é o mesmo que colar esse texto na conversa. No fim da conversa, digite <b>/debrief</b> e aperte <b>Enter</b>." },
+    ] },
+    body: `<p>O Claude seguiu as instruções do comando: revisou o que foi conversado e propôs o que guardar e em qual arquivo.</p>
+<p>Ele não escreve nada sem você aprovar: é o que pedem as linhas em amarelo do comando. ${T.debriefNote}</p>
+<p>Todo comando funciona assim: um arquivo em <b>.claude/commands/</b>, e o nome do arquivo vira o comando. Você pode criar outros, por exemplo um <code>/resumo</code> que lista as pendências. Basta pedir ao Claude.</p>`,
+    apply: s => { s.term.push({ t: "user", c: "/debrief" }, { t: "claude", c: T.debrief }); s.open = ".claude/commands/debrief.md"; s.ref = { ".claude/commands/debrief.md": [9, 10] }; s.focus = "term"; } },
 
   { ch: 3, title: "Os arquivos se atualizam",
     act: { kind: "chip", label: "pode salvar", do: "Se estiver de acordo, aprove: clique em <b>pode salvar</b>." },
@@ -1718,11 +1763,12 @@ function buildSteps(T) {
     apply: s => { s.mode = "desktop"; s.desk = "cycle"; s.hold = ["ex", "cp"]; } },
 
   { ch: 4, title: "Quando o caderno cresce",
-    body: `<p>Comece com um assunto. Quando ele virar uma área inteira, com tarefas chegando toda semana, o caderno ganha duas camadas:</p>
-<ul><li><b>Referência:</b> o que é verdade e muda devagar, como as regras e o passo a passo do que se repete.</li>
-<li><b>Tarefas:</b> o que você está fazendo agora. Uma pasta por tarefa, que vai para o arquivo quando termina.</li></ul>
-<p>No fim de cada tarefa, o <code>/debrief</code> leva o que você aprendeu para a referência. A tarefa vai para o arquivo, mas o aprendizado fica.</p>
-<p>${T.grow.intro} Não precisa começar assim: é para quando a pasta pedir.</p>`,
+    body: `<p>Comece com um assunto. Quando ele virar uma área inteira, com coisas novas chegando toda semana, a pasta ganha duas camadas:</p>
+<ul><li><b>Referência:</b> o que vale além de uma tarefa, como regras e o passo a passo do que se repete.</li>
+<li><b>Tarefas:</b> uma pasta por tarefa. O que está em andamento fica em <b>agora/</b>; quando termina, vai para <b>arquivo/</b>.</li></ul>
+<p>${T.grow2.how}</p>
+<p>${T.grow2.example}</p>
+<p>Não precisa começar assim: é para quando a pasta pedir.</p>`,
     apply: s => { s.mode = "desktop"; s.desk = "grow"; } },
 
   { ch: 4, title: "“Mas eu já uso…”",
@@ -1821,15 +1867,22 @@ function desktopHTML(s) {
       <div class="toolcard"><span class="ic">3</span><b>Claude Code</b><span>O Claude rodando no terminal, lendo, criando e editando os arquivos da sua pasta. Usa a sua conta do Claude.</span></div>
     </div></div>`;
   if (s.desk === "grow") {
-    const g = T.grow, row = ([n, x]) => `<div class="gr-row"><span>${n}</span><span>${x}</span></div>`;
-    return `<div class="desktop">
-    <div class="growcard" aria-label="Exemplo de caderno de ${g.area}, com referência e tarefas">
-      <span class="gr-label">exemplo · ${g.area}</span>
+    const g = T.grow2, dirs = T.dirs.map(([d]) => d);
+    const hoje = `<div class="g2-card g2-hoje"><span class="gr-label">hoje</span>
+      <span class="gr-root">${T.folder}/</span>
+      <span class="g2-item">CLAUDE.md</span>${dirs.map(d => `<span class="g2-item">${d}</span>`).join("")}</div>`;
+    const inside = g.inside.length ? `<span class="g2-inside">${g.inside.join(" · ")}</span>` : "";
+    const depois = `<div class="g2-card"><span class="gr-label">quando crescer · ${g.area}</span>
       <span class="gr-root">${g.root}</span>
-      <div class="gr-row main"><span>CLAUDE.md</span><span>o índice: para cada assunto, onde ler</span></div>
-      <span class="gr-layer">referência</span>${g.ref.map(row).join("")}
-      <span class="gr-layer">tarefas</span>${g.tasks.map(row).join("")}
-    </div></div>`;
+      <span class="g2-item">CLAUDE.md</span>
+      <span class="gr-layer">referência</span>
+      ${g.ref.map(d => `<span class="g2-item">${d}${(g.up || []).includes(d) ? ` <em class="g2-up">↑ subiu da pasta de hoje</em>` : ""}</span>`).join("")}
+      <span class="gr-layer">tarefas</span>
+      <span class="g2-item">agora/</span>
+      <span class="g2-item g2-sub"><b>${g.now}</b><em>← ${g.nowNote}</em></span>${inside}
+      <span class="g2-item">arquivo/</span>
+      <span class="g2-item g2-sub g2-done">${g.done}</span></div>`;
+    return `<div class="desktop"><div class="grow2" aria-label="A pasta de hoje e como ela fica quando crescer">${hoje}<span class="g2-arrow">→</span>${depois}</div></div>`;
   }
   if (s.desk === "later") return `<div class="desktop">
     <div class="cal">sáb, 8 de novembro</div>
