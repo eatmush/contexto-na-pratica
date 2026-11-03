@@ -219,6 +219,57 @@ code { font-family: var(--font-mono); font-size: .88em; }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; padding: 10px 22px; }
 .hint { font-size: 12px; color: #8a96a2; text-align: center; margin-top: 8px; }
 
+/* Página inicial */
+body.is-landing { height: auto; min-height: 100%; }
+body.is-landing .top, body.is-landing .main { display: none; }
+body:not(.is-landing) .landing { display: none; }
+.brand { color: inherit; text-decoration: none; }
+.landing { max-width: 1120px; width: 100%; margin: 0 auto; padding: 0 24px 40px; display: flex; flex-direction: column; gap: 56px; }
+.lhead { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 0 0; }
+.lhead a.gh { color: var(--muted); font-size: 14px; }
+.hero { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 40px; align-items: center; }
+.hero .eyebrow { font-size: 13px; }
+.hero h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(34px, 5vw, 54px); line-height: 1.05; letter-spacing: -.03em; margin: 10px 0 16px; text-wrap: balance; }
+.hero p.lead { font-size: 18px; color: var(--muted); margin: 0 0 24px; max-width: 46ch; }
+.cta { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.cta a.btn { text-decoration: none; display: inline-block; font-size: 17px; padding: 13px 26px; }
+.cta span { color: var(--muted); font-size: 14px; }
+.compare { display: flex; flex-direction: column; gap: 14px; }
+.ccard { border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+.ccard h3 { margin: 0; font-size: 12.5px; letter-spacing: .06em; text-transform: uppercase; font-weight: 600; }
+.ccard.chatc { background: var(--paper); border: 1px solid #ccd5dd; }
+.ccard.chatc h3 { color: var(--muted); }
+.ccard.repoc { background: var(--vs-bg); color: var(--vs-text); }
+.ccard.repoc h3 { color: #e28b5f; }
+.ccard.repoc .q { background: #33373f; }
+.ccard .q { align-self: flex-end; background: var(--ink); color: #fff; border-radius: 12px 12px 4px 12px; padding: 8px 12px; font-size: 14.5px; max-width: 88%; }
+.ccard .a { font-size: 14.5px; }
+.ccard.chatc .a { color: var(--muted); }
+.ccard.repoc .a { font-family: var(--font-mono); font-size: 13px; line-height: 1.6; }
+.ccard.repoc .a b { color: #fff; }
+.ccard.repoc .src { font-family: var(--font-mono); font-size: 12px; color: var(--vs-dim); }
+.lsec h2 { font-family: var(--font-display); font-size: 28px; letter-spacing: -.02em; margin: 0 0 18px; }
+.parts { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+.parts a { display: flex; flex-direction: column; gap: 6px; height: 100%; text-decoration: none; color: inherit; background: var(--paper); border: 1px solid #d3dbe2; border-radius: 12px; padding: 16px; }
+.parts a:hover { border-color: var(--accent); }
+.parts .n { font-family: var(--font-mono); font-size: 12px; color: var(--accent); font-weight: 600; }
+.parts b { font-size: 16px; }
+.parts span:last-child { color: var(--muted); font-size: 14px; }
+.who { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.who p { margin: 0; color: var(--muted); max-width: 52ch; }
+.who h3 { margin: 0 0 6px; font-size: 17px; }
+.lfoot { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; border-top: 1px solid #c9d2da; padding-top: 24px; }
+.lfoot p { margin: 0; color: var(--muted); font-size: 14px; }
+
+@media (max-width: 980px) {
+  .hero { grid-template-columns: minmax(0, 1fr); }
+  .parts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .landing { padding: 0 16px 32px; gap: 40px; }
+  .parts, .who { grid-template-columns: minmax(0, 1fr); }
+}
+
 @media (max-width: 980px) {
   .main { grid-template-columns: minmax(0, 1fr); }
   .screen { min-height: 480px; height: 64vh; }
@@ -243,8 +294,67 @@ code { font-family: var(--font-mono); font-size: .88em; }
 </head>
 <body>
 
+<div class="landing" id="landing">
+  <header class="lhead">
+    <a class="brand" href="/" data-home>Repositório de contexto <span>na prática</span></a>
+    <a class="gh" href="https://github.com/eatmush/contexto-na-pratica" target="_blank" rel="noopener">Código no GitHub</a>
+  </header>
+
+  <section class="hero">
+    <div>
+      <div class="eyebrow">Passo a passo interativo · sem instalar nada</div>
+      <h1>Pare de explicar tudo de novo para a IA</h1>
+      <p class="lead">Veja, numa simulação da tela do computador, como montar uma pasta de arquivos que o Claude lê antes de cada conversa. Assim ele já começa sabendo do seu assunto.</p>
+      <div class="cta">
+        <a class="btn primary" href="/passo-1" data-step="0">Começar o passo a passo</a>
+        <span>18 passos curtos. Não precisa saber programar.</span>
+      </div>
+    </div>
+    <div class="compare" aria-label="Exemplo: a mesma pergunta com e sem repositório de contexto">
+      <div class="ccard chatc">
+        <h3>No chat comum, numa conversa nova</h3>
+        <div class="q">O marceneiro mandou R$ 15.800 pelos armários. Cabe no meu orçamento?</div>
+        <div class="a">Para avaliar, preciso de mais informações. Qual é o seu orçamento total? Quanto você planejou gastar com marcenaria?</div>
+      </div>
+      <div class="ccard repoc">
+        <h3>Com um repositório de contexto</h3>
+        <div class="q">O marceneiro mandou R$ 15.800 pelos armários. Cabe no meu orçamento?</div>
+        <div class="a">Não cabe no que você planejou. O teto de marcenaria é <b>R$ 12.000</b>, então passa R$ 3.800, e a sua reserva para imprevistos cairia para R$ 200.</div>
+        <div class="src">⎿ Lendo decisoes/escolhas.md</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="lsec">
+    <h2>O que você vai ver</h2>
+    <ol class="parts">
+      <li><a href="/passo-1" data-step="0"><span class="n">Parte 1</span><b>O problema</b><span>Por que o chat esquece tudo entre uma conversa e outra.</span></a></li>
+      <li><a href="/passo-3" data-step="2"><span class="n">Parte 2</span><b>Montando</b><span>Criar a pasta e deixar o Claude entrevistar você sobre o assunto.</span></a></li>
+      <li><a href="/passo-10" data-step="9"><span class="n">Parte 3</span><b>Uma semana depois</b><span>Voltar, perguntar, e o Claude já saber a resposta.</span></a></li>
+      <li><a href="/passo-14" data-step="13"><span class="n">Parte 4</span><b>Guardando</b><span>Registrar o que importa e salvar uma cópia de segurança.</span></a></li>
+      <li><a href="/passo-17" data-step="16"><span class="n">Parte 5</span><b>Sua vez</b><span>O guia para montar o seu, com tudo pronto para copiar.</span></a></li>
+    </ol>
+  </section>
+
+  <section class="lsec who">
+    <div>
+      <h3>Para quem é</h3>
+      <p>Para quem já usa ChatGPT ou Claude no dia a dia, nunca abriu um terminal e quer que a IA acompanhe um assunto ao longo do tempo: uma reforma, um negócio, um projeto do trabalho, um hobby.</p>
+    </div>
+    <div>
+      <h3>O que você precisa depois</h3>
+      <p>Para assistir, só o navegador. Para fazer no seu computador: um Mac ou Windows, o VS Code (gratuito) e um plano pago do Claude, como o Pro.</p>
+    </div>
+  </section>
+
+  <footer class="lfoot">
+    <p>Exemplo usado no passo a passo: a reforma de um apartamento.</p>
+    <a class="btn primary" href="/passo-1" data-step="0" style="text-decoration:none">Começar o passo a passo</a>
+  </footer>
+</div>
+
 <header class="top">
-  <div class="brand">Repositório de contexto <span>na prática</span></div>
+  <a class="brand" href="/" data-home>Repositório de contexto <span>na prática</span></a>
   <nav class="chapters" id="chapters" aria-label="Partes"></nav>
 </header>
 
@@ -759,19 +869,32 @@ async function fillTerm(s, from, token) {
 /* ---------- Navegação ---------- */
 let cur = 0, animToken = 0;
 
-/* Cada passo tem um endereço próprio (/passo-N) para o Vercel Analytics
-   contar quantas pessoas chegaram a cada passo. O passo 1 é "/". */
-const pathFor = i => i === 0 ? "/" : `/passo-${i + 1}`;
+/* "/" é a página inicial. Cada passo tem um endereço próprio (/passo-N)
+   para o Vercel Analytics contar quantas pessoas chegaram a cada passo. */
+const pathFor = i => `/passo-${i + 1}`;
 function stepFromPath() {
   const m = location.pathname.match(/^\/passo-(\d+)\/?$/);
-  return m ? Math.max(0, Math.min(STEPS.length - 1, +m[1] - 1)) : 0;
+  return m ? Math.max(0, Math.min(STEPS.length - 1, +m[1] - 1)) : -1;
+}
+function pushPath(p) {
+  if (location.pathname === p) return;
+  try { history.pushState(null, "", p); } catch { /* arquivo local ou prévia: sem endereço por passo */ }
+}
+function showLanding(push) {
+  animToken++;
+  if (push) pushPath("/");
+  document.body.classList.add("is-landing");
+  window.scrollTo(0, 0);
+}
+function route() {
+  const k = stepFromPath();
+  if (k < 0) showLanding(false); else go(k, false, false);
 }
 
 function go(i, animate, push = true) {
   i = Math.max(0, Math.min(STEPS.length - 1, i));
-  if (push && location.pathname !== pathFor(i)) {
-    try { history.pushState(null, "", pathFor(i)); } catch { /* arquivo local ou prévia: sem endereço por passo */ }
-  }
+  if (push) pushPath(pathFor(i));
+  document.body.classList.remove("is-landing");
   const forward = animate && i === cur + 1 && !reduce;
   const prev = forward ? replay(cur) : null;
   cur = i;
@@ -810,7 +933,14 @@ $("chapters").addEventListener("click", e => {
 });
 $("next").addEventListener("click", () => cur === STEPS.length - 1 ? go(0, false) : go(cur + 1, true));
 $("prev").addEventListener("click", () => go(cur - 1, false));
+document.addEventListener("click", e => {
+  const a = e.target.closest("a[data-step], a[data-home]"); if (!a) return;
+  if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+  e.preventDefault();
+  if (a.hasAttribute("data-home")) showLanding(true); else go(+a.dataset.step, false);
+});
 document.addEventListener("keydown", e => {
+  if (document.body.classList.contains("is-landing")) return;
   if (e.target.closest("input, textarea")) return;
   if (e.key === "ArrowRight") { e.preventDefault(); if (cur < STEPS.length - 1) go(cur + 1, true); }
   if (e.key === "ArrowLeft") { e.preventDefault(); go(cur - 1, false); }
@@ -823,8 +953,8 @@ $("screen").addEventListener("click", async e => {
   setTimeout(() => { b.textContent = "Copiar"; }, 1800);
 });
 
-window.addEventListener("popstate", () => go(stepFromPath(), false, false));
-go(stepFromPath(), false, false);
+window.addEventListener("popstate", route);
+route();
 </script>
 <!-- Vercel Speed Insights (só funciona no site publicado no Vercel) -->
 <script>
