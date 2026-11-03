@@ -1535,7 +1535,7 @@ function buildSteps(T) {
     apply: s => { s.chat = "amnesia"; s.ex = 2; s.cp = 3; } },
 
   { ch: 0, title: "A virada: e se a IA trabalhasse na sua pasta?",
-    body: `<p>Em vez de conversar numa janela à parte, você abre o Claude dentro de uma pasta do seu computador. Ali ele lê os arquivos antes de responder e cria e edita arquivos para você. Só dentro dessa pasta, e só com o seu ok.</p>
+    body: `<p>Em vez de conversar numa janela à parte, você abre o Claude dentro de uma pasta do seu computador. Ali ele lê os arquivos antes de responder e cria e edita arquivos para você, dentro dessa pasta. Você vê cada mudança.</p>
 <p>Dentro dela fica o <b>caderno</b>: arquivos de texto com quem você é, o que já foi decidido e onde está cada coisa. Isso tem nome: <b>repositório de contexto</b>.</p>
 <p>Você vai usar as três ferramentas da tela. Nenhuma delas exige saber programar.</p>
 <p>O placar congelou. Daqui pra frente, vamos ver se esses números sobem.</p>`,
@@ -1566,7 +1566,7 @@ function buildSteps(T) {
   { ch: 1, title: "O único comando que você vai digitar",
     act: { kind: "type", word: "claude", do: "No terminal, digite <b>claude</b> e aperte <b>Enter</b>." },
     body: `<p>Isso abre o Claude Code. É o único comando que você precisa saber. Daqui para frente, você conversa com o Claude em português, como no chat.</p>
-<p>A diferença em relação ao chat: aqui ele lê, cria e edita os arquivos desta pasta, sempre perguntando antes. Fora dela, ele não mexe em nada.</p>`,
+<p>A diferença em relação ao chat: aqui ele lê, cria e edita os arquivos desta pasta. Cada arquivo novo ou alterado aparece marcado no Explorador, então você sempre vê o que mudou.</p>`,
     apply: s => { s.term.push({ t: "prompt", ps: REPO, c: "claude" }, { t: "box" }); s.claude = true; s.focus = "term"; } },
 
   { ch: 1, title: "A entrevista",
@@ -1903,7 +1903,8 @@ function guideHTML() {
       <div class="copy"><small>Windows (PowerShell)</small>irm https://claude.ai/install.ps1 | iex<button data-copy="irm https://claude.ai/install.ps1 | iex">Copiar</button></div></div></li>
     <li><div><h5>Crie a pasta do seu assunto</h5><p>No VS Code, clique em <b>Abrir pasta</b> no Explorador (ou menu File → Open Folder). Na janela que abrir, escolha <b>Documentos</b>, clique em <b>Nova pasta</b>, dê um nome curto ao seu assunto, sem espaços nem acentos, e clique em <b>Abrir</b>.</p></div></li>
     <li><div><h5>Chame o Claude</h5><p>Abra o terminal (menu Terminal → New Terminal), digite o comando abaixo e aperte Enter. É o único comando que você precisa saber.</p>
-      <div class="copy">claude<button data-copy="claude">Copiar</button></div></div></li>
+      <div class="copy">claude<button data-copy="claude">Copiar</button></div>
+      <p>Ele já começa trabalhando sozinho dentro da pasta. Se preferir aprovar cada mudança antes, aperte <b>Shift+Tab</b> uma vez: ele passa a pedir autorização.</p></div></li>
     <li><div><h5>Cole o roteiro e responda à entrevista</h5><p>O Claude cria o CLAUDE.md, as pastas e o comando <code>/debrief</code>.</p>
       <div class="copy long" id="roteiro">${esc(ROTEIRO)}<button data-copy-id="roteiro">Copiar</button></div></div></li>
     <li><div><h5>Use o ciclo</h5><p>Abrir, trabalhar, <code>/debrief</code>. Se a pasta estiver no Google Drive, no OneDrive ou no iCloud Drive, a cópia de segurança acontece sozinha. Quem quiser ir além pode guardar o histórico de cada mudança no <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>, mas não é preciso para começar.</p></div></li>
@@ -1919,7 +1920,8 @@ function faqHTML() {
     `<p>Resolve parte: ela guarda fatos soltos sobre você. Só que você não escolhe direito o que fica nem onde, e ela continua presa no chat, sem mexer nos seus arquivos.</p>
      <p>Na pasta, você vê cada anotação, edita quando quiser, e a IA trabalha nos documentos de verdade.</p>`)}
   ${qa("É seguro deixar a IA mexer nos meus arquivos?",
-    `<p>Ela só enxerga a pasta que você abriu, não o computador inteiro. E pergunta antes de criar ou mudar qualquer coisa.</p>`)}
+    `<p>Ele trabalha na pasta que você abriu, e cada mudança fica à vista: arquivo novo aparece com U, alterado com M. O que vai para o caderno passa pelo <code>/debrief</code>, que só grava com o seu ok.</p>
+     <p>Prefere aprovar cada mudança antes? Aperte <b>Shift+Tab</b> uma vez, e ele passa a pedir autorização.</p>`)}
   ${qa("Mas eu já uso os Projetos do ChatGPT ou do Claude.",
     `<p>Eles resolvem parte disso: os arquivos que você sobe valem em toda conversa do projeto. Só que quem mantém esses arquivos em dia é você, à mão, e a IA não cria nem edita nada neles.</p>
      <p>Na pasta, o Claude trabalha nos arquivos e propõe as atualizações do caderno, e você aprova. E tudo fica no seu computador.</p>
