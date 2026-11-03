@@ -588,6 +588,12 @@ transform: none; }
 @keyframes swapin { from { opacity: .2; transform: translateY(4px); } to { opacity: 1; } }
 .tema-top { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
 .tema-top select { font: inherit; color: var(--ink); background: #fff; border: 1px solid #cfd4d0; border-radius: 999px; padding: 3px 10px; cursor: pointer; }
+.landing .grow { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1fr); gap: 40px; align-items: center; }
+.landing .grow h2 { font-size: clamp(28px, 3.6vw, 40px); margin: 12px 0 14px; }
+.landing .grow p { margin: 0 0 12px; max-width: 46ch; }
+.landing .tree .layer { font-family: var(--font-mono); font-size: 11.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-top: 8px; padding-left: 18px; }
+.landing .tree .layer::after { content: ""; display: block; border-top: 1px dashed #c9cfcb; margin-top: 4px; }
+@media (max-width: 860px) { .landing .grow { grid-template-columns: minmax(0, 1fr); gap: 20px; } }
 body.is-landing { height: auto; min-height: 100%; background: #f1f2f0; }
 body.is-landing .top, body.is-landing .main { display: none; }
 body:not(.is-landing) .landing { display: none; }
@@ -799,6 +805,31 @@ body:not(.is-landing) .landing { display: none; }
           <p>Não. Para assistir ao passo a passo, só o navegador. Para fazer no seu computador: um Mac ou Windows e um plano pago do Claude, como o Pro.</p>
           <p>É para quem já usa ChatGPT ou Claude no dia a dia, nunca abriu um terminal e quer que a IA acompanhe um assunto ao longo do tempo: uma reforma, um negócio, um projeto do trabalho, um hobby.</p>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block grow">
+    <div class="grow-text">
+      <span class="day">mais adiante</span>
+      <h2>Quando o caderno cresce</h2>
+      <p>Comece com um assunto. Quando ele virar uma área inteira, como o seu trabalho, com tarefas chegando toda semana, o caderno ganha duas camadas.</p>
+      <p><b>Referência</b> é o que é verdade e muda devagar: o tom de voz, as regras, o passo a passo do que se repete. <b>Tarefas</b> é o que você está fazendo agora: uma pasta por tarefa, que vai para o arquivo quando termina.</p>
+      <p>No fim de cada tarefa, o <code>/debrief</code> leva o que você aprendeu para a referência. A tarefa vai para o arquivo, mas o aprendizado fica.</p>
+    </div>
+    <div class="scene" aria-label="Exemplo de caderno de uma área de trabalho, com referência e tarefas">
+      <span class="label">exemplo · a área de comunicação inteira</span>
+      <div class="tree">
+        <span class="troot">comunicacao-da-marca/</span>
+        <div class="row main"><span>CLAUDE.md</span><span>o índice: para cada assunto, onde ler</span></div>
+        <span class="layer">referência</span>
+        <div class="row"><span>marca/</span><span>tom de voz e o que a marca não diz</span></div>
+        <div class="row"><span>aprendizados/</span><span>o que funcionou e o que deu errado</span></div>
+        <div class="row"><span>como-fazer/</span><span>o passo a passo do que se repete</span></div>
+        <span class="layer">tarefas</span>
+        <div class="row"><span>agora/</span><span>2026-11-08 Slogan do protetor</span></div>
+        <div class="row"><span>acompanhando/</span><span>Relatório mensal das redes</span></div>
+        <div class="row"><span>arquivo/</span><span>2026-03 Hidratante, e mais 40 tarefas</span></div>
       </div>
     </div>
   </section>
