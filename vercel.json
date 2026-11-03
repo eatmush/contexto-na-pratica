@@ -1,6 +1,7 @@
 {
   "rewrites": [
     { "source": "/passo-:n", "destination": "/index.html" },
-    { "source": "/:tema/passo-:n", "destination": "/index.html" }
+    { "source": "/:tema/passo-:n", "destination": "/index.html" },
+    { "source": "/concluido", "destination": "/index.html" }
   ]
 }
