@@ -677,7 +677,9 @@ body:not(.is-landing) #landing { display: none; }
 .actchip::before { content: "▸ "; }
 .ghost { color: #5b616b; }
 .typed { color: #fff; }
-.ln.typing { cursor: pointer; }
+.ln.typing.shake { animation: shake .28s ease-in-out; }
+@keyframes shake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+@media (pointer: coarse) { .ln.typing { cursor: pointer; } }
 
 /* Pré-visualização do markdown */
 .tab-icons { margin-left: auto; display: flex; align-items: center; padding: 0 10px; }
@@ -2130,7 +2132,8 @@ function go(i, animate, push = true) {
     if (st.act.kind === "chip") s.chip = st.act.label;
     setNarr(i, st, `<p class="do">${st.act.do}</p>`);
     $("next").textContent = "Próximo"; $("next").disabled = true;
-    $("hint").textContent = "Faça a ação na tela para continuar";
+    $("hint").textContent = st.act.kind !== "type" ? "Faça a ação na tela para continuar"
+      : matchMedia("(pointer: coarse)").matches ? "Toque na linha do terminal" : "Digite no teclado";
     renderScreen(s, null, false);
     renderPlacar(s, null);
     return;
@@ -2179,12 +2182,18 @@ document.addEventListener("keydown", e => {
   if (e.target.closest?.("input, textarea, select")) return;
   const act = pending && STEPS[cur].act;
   if (act && act.kind === "type") {
-    if (e.key === "Enter") { e.preventDefault(); return doAct(); }
-    if (e.key.length === 1 && !e.metaKey && !e.ctrlKey) {
+    /* Digitação de verdade: só a letra certa entra; Enter só com a palavra completa */
+    const t = $("typed"), g = $("ghost"), w = act.word, done = typedN === w.length;
+    const update = () => {
+      if (t && g) { t.textContent = w.slice(0, typedN); g.textContent = w.slice(typedN); }
+      $("hint").textContent = typedN === w.length ? "Agora aperte Enter" : "Digite no teclado";
+    };
+    const shake = () => { const l = t && t.closest(".ln"); if (!l) return; l.classList.remove("shake"); void l.offsetWidth; l.classList.add("shake"); };
+    if (e.key === "Enter") { e.preventDefault(); return done ? doAct() : shake(); }
+    if (e.key === "Backspace") { e.preventDefault(); typedN = Math.max(0, typedN - 1); return update(); }
+    if (e.key.length === 1 && !e.metaKey && !e.ctrlKey && !e.altKey) {
       e.preventDefault();
-      typedN = Math.min(act.word.length, typedN + 1);
-      const t = $("typed"), g = $("ghost");
-      if (t && g) { t.textContent = act.word.slice(0, typedN); g.textContent = act.word.slice(typedN); }
+      if (!done && e.key.toLowerCase() === w[typedN].toLowerCase()) { typedN++; update(); } else shake();
       return;
     }
   }
@@ -2192,7 +2201,11 @@ document.addEventListener("keydown", e => {
   if (e.key === "ArrowLeft") { e.preventDefault(); go(cur - 1, false); }
 });
 $("screen").addEventListener("click", async e => {
-  if (pending && e.target.closest("[data-act]")) return doAct();
+  if (pending && e.target.closest("[data-act]")) {
+    /* Digitar exige teclado; tocar na linha só conclui em tela de toque */
+    if (STEPS[cur].act.kind === "type" && !matchMedia("(pointer: coarse)").matches) return;
+    return doAct();
+  }
   const b = e.target.closest("button[data-copy], button[data-copy-id]"); if (!b) return;
   const text = b.dataset.copy ?? ROTEIRO;
   try { await navigator.clipboard.writeText(text); b.textContent = "Copiado"; }
