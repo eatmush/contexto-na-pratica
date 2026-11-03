@@ -176,6 +176,30 @@ code { font-family: var(--font-mono); font-size: .88em; }
 .cursor { display: inline-block; width: 7px; height: 14px; background: var(--vs-text); vertical-align: -2px; animation: blink 1s steps(1) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
 
+/* Janela de abrir pasta (simulada, neutra entre Mac e Windows) */
+.win.vs { position: relative; }
+.dlg-wrap { position: absolute; inset: 34px 0 0; background: rgba(0,0,0,.38); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 4; }
+.dlg { width: min(560px, 100%); background: #f4f5f4; color: #222; border-radius: 10px; box-shadow: 0 20px 60px rgba(0,0,0,.45); font-family: var(--font-body); font-size: 13px; overflow: hidden; animation: fadein .3s ease-out; }
+.dlg-title { padding: 9px 14px; font-weight: 600; text-align: center; border-bottom: 1px solid #dcdedc; background: #ecedec; }
+.dlg-body { display: grid; grid-template-columns: 130px minmax(0, 1fr); min-height: 170px; }
+.dlg-side { background: #e7e9e7; padding: 10px 0; display: flex; flex-direction: column; gap: 2px; }
+.dlg-side b { font-size: 11px; color: #777; padding: 0 12px 4px; font-weight: 600; }
+.dlg-side span { padding: 3px 12px; }
+.dlg-side span.on { background: #d3d7d4; font-weight: 600; }
+.dlg-main { padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; background: #fff; }
+.dlg-path { font-weight: 600; margin-bottom: 6px; }
+.dlg-row { display: flex; align-items: center; gap: 8px; padding: 4px 8px; border-radius: 5px; }
+.dlg-row i { width: 16px; height: 12px; border-radius: 2px; background: #8fb7e8; flex: none; }
+.dlg-row.sel { background: #2e3734; color: #fff; }
+.dlg-row em { margin-left: auto; font-style: normal; font-size: 11px; background: var(--lime); color: var(--ink); border-radius: 999px; padding: 0 8px; }
+.dlg-foot { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-top: 1px solid #dcdedc; }
+.dlg-foot .grow { flex: 1; }
+.dlg-btn { border: 1px solid #c9ccc9; background: #fff; border-radius: 6px; padding: 4px 12px; }
+.dlg-btn.pri { background: #2e3734; color: #fff; border-color: #2e3734; }
+.spotb { box-shadow: 0 0 0 3px var(--spot); animation: pulseb 1.6s ease-in-out infinite; }
+@keyframes pulseb { 50% { box-shadow: 0 0 0 3px rgba(200,252,126,.35); } }
+@media (max-width: 600px) { .dlg-body { grid-template-columns: minmax(0, 1fr); } .dlg-side { display: none; } }
+
 /* Destaques */
 .spot { box-shadow: inset 0 0 0 2px var(--spot); animation: pulse 1.6s ease-in-out infinite; }
 @keyframes pulse { 50% { box-shadow: inset 0 0 0 2px rgba(200,252,126,.35); } }
@@ -586,7 +610,7 @@ body:not(.is-landing) .landing { display: none; }
   <section class="hero">
     <div class="kicker">uma história curta sobre IA e memória</div>
     <h1>Você já contou a mesma história para a IA. <span class="hl">Mais de uma vez.</span></h1>
-    <p>Este site mostra, em 18 passos, como fazer o Claude lembrar do seu assunto de uma conversa para outra. Sem programar, e com um exemplo de verdade: a reforma de um apartamento.</p>
+    <p>Este site mostra, em 19 passos, como fazer o Claude lembrar do seu assunto de uma conversa para outra. Sem programar, e com um exemplo de verdade: a reforma de um apartamento.</p>
     <div class="cta-row">
       <a class="btn" href="/passo-1" data-step="0">Começar o passo a passo</a>
       <span>Não precisa instalar nada para assistir.</span>
@@ -931,7 +955,7 @@ No fim, me mostre o que criou e pergunte se quero ajustar algo.`;
 
 /* ---------- Passos ---------- */
 const CHAPTERS = ["O problema", "Montando", "Uma semana depois", "Guardando", "Sua vez"];
-const HOME = "~ $", REPO = "~/reforma-apartamento $";
+const HOME = "~ $", REPO = "~/Documents/reforma-apartamento $";
 const BASE_FILES = ["CLAUDE.md", "decisoes/escolhas.md", "orcamentos/pedreiro-joao.md", "plano/proximos-passos.md", "atas/", ".claude/commands/debrief.md", ".claude/commands/backup.md"];
 
 const STEPS = [
@@ -949,27 +973,27 @@ const STEPS = [
 
   { ch: 1, title: "Este é o VS Code",
     body: `<p>Pense nele como um editor de texto. Três áreas importam:</p>
-<ol><li><b>Arquivos:</b> a lista do que tem na sua pasta. Por enquanto, vazia.</li>
-<li><b>Editor:</b> onde um arquivo aparece quando você clica nele.</li>
-<li><b>Terminal:</b> onde você digita comandos. Fica dentro do próprio VS Code (menu Terminal → New Terminal).</li></ol>`,
+<ol><li><b>Explorador:</b> funciona como o Finder do Mac ou o Explorador de Arquivos do Windows. Mostra as pastas e arquivos, só que apenas os da pasta que você abriu. Por enquanto, nenhuma.</li>
+<li><b>Editor:</b> onde um arquivo aparece quando você clica nele no Explorador.</li>
+<li><b>Terminal:</b> onde você conversa com o Claude. Se ele não estiver aparecendo, use o menu Terminal → New Terminal.</li></ol>`,
     apply: s => { s.mode = "vs"; s.labels = true; } },
 
-  { ch: 1, title: "Criando a pasta",
-    body: `<p>No terminal, você digita três comandos. São sempre os mesmos:</p>
-<ul><li><code>mkdir reforma-apartamento</code> cria uma pasta nova.</li>
-<li><code>cd reforma-apartamento</code> entra nela.</li>
-<li><code>code .</code> abre essa pasta no VS Code. O ponto quer dizer "esta pasta aqui".</li></ul>
-<p>Repare que o nome da pasta apareceu no topo da lista de arquivos.</p>`,
-    apply: s => {
-      s.term.push({ t: "prompt", ps: HOME, c: "mkdir reforma-apartamento" },
-                  { t: "prompt", ps: HOME, c: "cd reforma-apartamento" },
-                  { t: "prompt", ps: REPO, c: "code ." });
-      s.folder = "reforma-apartamento"; s.ps = REPO; s.focus = "term";
-    } },
+  { ch: 1, title: "Criando a pasta, sem digitar nada",
+    body: `<p>No Explorador, clique em <b>Abrir pasta</b> (ou use o menu File → Open Folder).</p>
+<p>Abre a mesma janela que você já usa para abrir qualquer arquivo do computador. Escolha onde guardar, por exemplo em <b>Documentos</b>, clique em <b>Nova pasta</b> e dê um nome a ela: <b>reforma-apartamento</b>.</p>
+<p>Prefira um nome curto, sem espaços nem acentos.</p>`,
+    apply: s => { s.dialog = true; s.focus = "openbtn"; } },
 
-  { ch: 1, title: "Chamando o Claude",
-    body: `<p>Digitar <code>claude</code> no terminal abre o Claude Code.</p>
-<p>É o mesmo Claude do chat, com uma diferença: aqui ele enxerga e edita os arquivos desta pasta.</p>`,
+  { ch: 1, title: "A pasta aberta",
+    body: `<p>Clique em <b>Abrir</b>. O nome da pasta aparece no topo do Explorador. Ela está vazia por enquanto.</p>
+<p>É uma pasta comum do seu computador: se você abrir o Finder (ou o Explorador de Arquivos) e for em Documentos, ela estará lá.</p>
+<p>Repare no terminal: ele já está "dentro" da pasta. Tudo o que o Claude fizer a partir daqui acontece nela.</p>`,
+    apply: s => { s.folder = "reforma-apartamento"; s.ps = REPO; s.focus = "side"; } },
+
+  { ch: 1, title: "O único comando que você vai digitar",
+    body: `<p>No terminal, digite <code>claude</code> e aperte Enter. Isso abre o Claude Code.</p>
+<p>É o único comando que você precisa saber. Daqui para frente, você conversa com o Claude em português, como no chat.</p>
+<p>A diferença em relação ao chat: aqui ele enxerga e edita os arquivos desta pasta.</p>`,
     apply: s => { s.term.push({ t: "prompt", ps: REPO, c: "claude" }, { t: "box" }); s.claude = true; s.focus = "term"; } },
 
   { ch: 1, title: "A entrevista",
@@ -1105,12 +1129,12 @@ const STEPS = [
 /* ---------- Estado ---------- */
 function fresh() {
   return { mode: "chat", desk: null, folder: null, ps: HOME, files: [], contents: {}, changed: {},
-           open: null, tabs: [], term: [], claude: false, focus: null, labels: false, hl: {}, ref: {}, fresh: [] };
+           open: null, tabs: [], term: [], claude: false, dialog: false, focus: null, labels: false, hl: {}, ref: {}, fresh: [] };
 }
 function replay(i) {
   const s = fresh();
   for (let k = 0; k <= i; k++) {
-    s.focus = null; s.labels = false; s.hl = {}; s.ref = {}; s.fresh = [];
+    s.focus = null; s.labels = false; s.hl = {}; s.ref = {}; s.fresh = []; s.dialog = false;
     STEPS[k].apply(s);
   }
   if (s.open && !s.tabs.includes(s.open)) s.tabs.push(s.open);
@@ -1194,7 +1218,7 @@ function vsHTML(s) {
   const title = s.folder ? `${s.open ? s.open.split("/").pop() + " — " : ""}${s.folder} — Visual Studio Code` : "Visual Studio Code";
   const side = s.folder
     ? `<div class="root">${esc(s.folder.toUpperCase())}</div>${s.files.length ? treeHTML(s) : '<div class="empty">Pasta vazia.</div>'}`
-    : `<div class="empty">Nenhuma pasta aberta.</div><div class="fakebtn">Abrir pasta</div>`;
+    : `<div class="empty">Nenhuma pasta aberta.</div><div class="fakebtn ${s.focus === "openbtn" ? "spotb" : ""}">Abrir pasta</div>`;
   const tabs = s.tabs.map(p => `<div class="tab ${p === s.open ? "on" : ""}">${esc(p.split("/").pop())}</div>`).join("");
   let editor;
   if (s.open) {
@@ -1207,7 +1231,7 @@ function vsHTML(s) {
   return `<div class="win vs"><div class="titlebar"><div class="lights"><i></i><i></i><i></i></div><div class="t">${esc(title)}</div></div>
   <div class="vsbody">
     <div class="actbar"><i class="on"></i><i></i><i></i></div>
-    <div class="side ${sp("side")}">${tag(1, "Arquivos")}<h4>EXPLORADOR</h4>${side}</div>
+    <div class="side ${sp("side")}">${tag(1, "Explorador")}<h4>EXPLORADOR</h4>${side}</div>
     <div class="work">
       <div class="tabs">${tabs}</div>
       <div class="editor ${sp("editor")}" id="editor">${tag(2, "Editor")}${editor}</div>
@@ -1216,6 +1240,22 @@ function vsHTML(s) {
         <div class="tbody" id="tbody"></div>
       </div>
     </div>
+  </div>${s.dialog ? dialogHTML() : ""}</div>`;
+}
+
+function dialogHTML() {
+  return `<div class="dlg-wrap"><div class="dlg" role="img" aria-label="Janela de abrir pasta, com a nova pasta reforma-apartamento criada em Documentos">
+    <div class="dlg-title">Abrir pasta</div>
+    <div class="dlg-body">
+      <div class="dlg-side"><b>Favoritos</b><span>Mesa</span><span class="on">Documentos</span><span>Downloads</span></div>
+      <div class="dlg-main">
+        <div class="dlg-path">Documentos</div>
+        <div class="dlg-row"><i></i>Fotos da viagem</div>
+        <div class="dlg-row"><i></i>Impostos 2026</div>
+        <div class="dlg-row sel"><i></i>reforma-apartamento<em>nova pasta</em></div>
+      </div>
+    </div>
+    <div class="dlg-foot"><span class="dlg-btn spotb">Nova pasta</span><span class="grow"></span><span class="dlg-btn">Cancelar</span><span class="dlg-btn pri">Abrir</span></div>
   </div></div>`;
 }
 
@@ -1229,10 +1269,9 @@ function guideHTML() {
     <li><div><h5>Instale o Claude Code</h5><p>Cole o comando do seu sistema no terminal e aperte Enter. É preciso ter um plano pago do Claude, como o Pro ou o Max: o plano gratuito não inclui o Claude Code. Quando terminar, feche o terminal e abra um novo (menu Terminal → New Terminal). Na primeira vez que você digitar <code>claude</code>, ele abre o navegador para você entrar na sua conta. Instruções oficiais, em português: <a href="https://code.claude.com/docs/pt/setup" target="_blank" rel="noopener">code.claude.com/docs</a>.</p>
       <div class="copy"><small>Mac ou Linux</small>curl -fsSL https://claude.ai/install.sh | bash<button data-copy="curl -fsSL https://claude.ai/install.sh | bash">Copiar</button></div>
       <div class="copy"><small>Windows (PowerShell)</small>irm https://claude.ai/install.ps1 | iex<button data-copy="irm https://claude.ai/install.ps1 | iex">Copiar</button></div></div></li>
-    <li><div><h5>Crie a pasta do seu assunto</h5><p>Troque <code>meu-assunto</code> por um nome curto, sem espaços nem acentos. Depois, no terminal da janela que abrir, digite <code>claude</code>.</p>
-      <div class="copy">mkdir meu-assunto
-cd meu-assunto
-code .<button data-copy="mkdir meu-assunto&#10;cd meu-assunto&#10;code .">Copiar</button></div></div></li>
+    <li><div><h5>Crie a pasta do seu assunto</h5><p>No VS Code, clique em <b>Abrir pasta</b> no Explorador (ou menu File → Open Folder). Na janela que abrir, escolha <b>Documentos</b>, clique em <b>Nova pasta</b>, dê um nome curto ao seu assunto, sem espaços nem acentos, e clique em <b>Abrir</b>.</p></div></li>
+    <li><div><h5>Chame o Claude</h5><p>Abra o terminal (menu Terminal → New Terminal), digite o comando abaixo e aperte Enter. É o único comando que você precisa saber.</p>
+      <div class="copy">claude<button data-copy="claude">Copiar</button></div></div></li>
     <li><div><h5>Cole o roteiro e responda à entrevista</h5><p>O Claude cria o CLAUDE.md, as pastas e os comandos <code>/debrief</code> e <code>/backup</code>.</p>
       <div class="copy long" id="roteiro">${esc(ROTEIRO)}<button data-copy-id="roteiro">Copiar</button></div></div></li>
     <li><div><h5>Use o ciclo</h5><p>Abrir, conversar, <code>/debrief</code>, <code>/backup</code>. O <code>/backup</code> precisa de uma conta gratuita no <a href="https://github.com/signup" target="_blank" rel="noopener">GitHub</a>. Se não quiser criar agora, use só o <code>/debrief</code>: seus arquivos ficam no seu computador.</p></div></li>
@@ -1250,7 +1289,7 @@ function lineEl(l) {
   else if (l.t === "paste") { d.classList.add("user"); d.innerHTML = `<span class="gt">&gt;</span> <span class="paste">${esc(l.c)}</span>`; }
   else if (l.t === "claude") { d.classList.add("claude"); d.innerHTML = `<span class="dot">●</span><span>${inline(l.c)}</span>`; }
   else if (l.t === "tool") { d.classList.add("tool"); if (l.ok) d.classList.add("ok"); d.innerHTML = `⎿ ${inline(l.c)}`; }
-  else if (l.t === "box") { d.innerHTML = `<div class="box"><b>✻ Claude Code</b><div>pasta: ~/reforma-apartamento</div></div>`; }
+  else if (l.t === "box") { d.innerHTML = `<div class="box"><b>✻ Claude Code</b><div>pasta: ~/Documents/reforma-apartamento</div></div>`; }
   return d;
 }
 const typed = l => l.t === "prompt" || l.t === "user";
