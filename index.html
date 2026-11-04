@@ -6,8 +6,12 @@
 <title>Tire a IA do chat · Repositório de contexto na prática</title>
 <meta name="description" content="Veja, em 10 minutos e sem instalar nada, como o Claude pode trabalhar direto nos arquivos do seu computador, já sabendo tudo sobre o seu assunto.">
 <link rel="canonical" href="https://contexto-na-pratica.vercel.app/">
+<link rel="alternate" hreflang="pt-BR" href="https://contexto-na-pratica.vercel.app/">
+<link rel="alternate" hreflang="en" href="https://contexto-na-pratica.vercel.app/en/">
+<link rel="alternate" hreflang="x-default" href="https://contexto-na-pratica.vercel.app/">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pt_BR">
+<meta property="og:locale:alternate" content="en_US">
 <meta property="og:site_name" content="Repositório de contexto na prática">
 <meta property="og:url" content="https://contexto-na-pratica.vercel.app/">
 <meta property="og:title" content="Tire a IA do chat">
@@ -635,6 +639,9 @@ transform: none; }
 .landing .story.swap .scene, .landing .story.swap .chapter p { animation: swapin .35s ease-out; }
 @keyframes swapin { from { opacity: .2; transform: translateY(4px); } to { opacity: 1; } }
 .tema-top { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+.head-r { display: flex; align-items: center; gap: 16px; }
+a.lang, .landing a.lang { font-size: 13px; font-weight: 600; color: var(--muted); text-decoration: none; border: 1px solid #d2d3d2; border-radius: 999px; padding: 3px 10px; white-space: nowrap; }
+a.lang:hover, .landing a.lang:hover { color: var(--ink); border-color: var(--ink); }
 .tema-top select { font: inherit; color: var(--ink); background: #fff; border: 1px solid #d2d3d2; border-radius: 999px; padding: 3px 10px; cursor: pointer; }
 .landing .grow { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1fr); gap: 40px; align-items: center; }
 .landing .grow h2 { font-size: clamp(28px, 3.6vw, 40px); margin: 12px 0 14px; }
@@ -830,7 +837,7 @@ body:not(.is-landing) #landing { display: none; }
 <div class="wrap mini">
   <header class="head">
     <a class="brand" href="/" data-home>Repositório de contexto <span class="hl">na prática</span></a>
-    <a class="gh" href="https://github.com/eatmush/contexto-na-pratica" target="_blank" rel="noopener">Código no GitHub</a>
+    <div class="head-r"><a class="lang" href="/en/" hreflang="en" lang="en">English</a><a class="gh" href="https://github.com/eatmush/contexto-na-pratica" target="_blank" rel="noopener">Código no GitHub</a></div>
   </header>
 
   <section class="hero">
@@ -859,6 +866,7 @@ body:not(.is-landing) #landing { display: none; }
 <div class="wrap">
   <header class="head">
     <a class="brand" href="/" data-home>Repositório de contexto <span class="hl">na prática</span></a>
+    <div class="head-r"><a class="lang" href="/en/" hreflang="en" lang="en">English</a></div>
   </header>
   <section class="card">
     <div class="kicker">antes de começar</div>
@@ -878,7 +886,7 @@ body:not(.is-landing) #landing { display: none; }
 <div class="wrap">
   <header class="head">
     <a class="brand" href="/" data-home>Repositório de contexto <span class="hl">na prática</span></a>
-    <a class="gh" href="https://github.com/eatmush/contexto-na-pratica" target="_blank" rel="noopener">Código no GitHub</a>
+    <div class="head-r"><a class="lang" href="/en/" hreflang="en" lang="en">English</a><a class="gh" href="https://github.com/eatmush/contexto-na-pratica" target="_blank" rel="noopener">Código no GitHub</a></div>
   </header>
   <section class="hero">
     <div class="kicker">passo a passo concluído</div>
@@ -936,6 +944,7 @@ body:not(.is-landing) #landing { display: none; }
         <option value="confeitaria">uma confeitaria por encomenda</option>
         <option value="campanha">uma campanha no trabalho</option>
       </select></label>
+  <a class="lang" href="/en/" hreflang="en" lang="en">English</a>
   <nav class="chapters" id="chapters" aria-label="Partes"></nav>
 </header>
 
@@ -2420,6 +2429,14 @@ document.querySelectorAll("select.tema").forEach(el => el.addEventListener("chan
   setTheme(el.value);
   if (!document.body.classList.contains("is-landing")) { pending = false; go(cur, false); }
 }));
+/* Idioma: o link "English" leva à mesma tela na versão em inglês (só o exemplo da reforma) */
+const langPath = () => {
+  const b = document.body.classList;
+  if (b.contains("is-done")) return "/en/done";
+  if (b.contains("is-landing") || b.contains("is-phone")) return "/en/";
+  return `/en/step-${cur + 1}`;
+};
+document.querySelectorAll("a.lang").forEach(a => a.addEventListener("click", () => { a.href = langPath(); }));
 window.addEventListener("popstate", route);
 {
   let salvo = "reforma";

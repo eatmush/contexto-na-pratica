@@ -15,6 +15,22 @@
     {
       "source": "/no-celular",
       "destination": "/index.html"
+    },
+    {
+      "source": "/en",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/step-:n",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/done",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/phone",
+      "destination": "/en/index.html"
     }
   ]
 }
